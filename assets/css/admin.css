@@ -1,0 +1,280 @@
+/* assets/css/admin.css */
+
+/* Base & Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #0f172a; /* Deep modern dark tone */
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+/* Layout */
+.admin-dashboard {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 280px;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 20px 30px;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-menu {
+    list-style: none;
+    flex: 1;
+}
+
+.sidebar-menu li {
+    margin: 5px 20px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #cbd5e1;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sidebar-menu a .icon {
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.sidebar-menu a:hover, .sidebar-menu li.active a {
+    background: rgba(56, 189, 248, 0.1);
+    color: #38bdf8;
+    transform: translateX(5px);
+}
+
+/* Main Content area */
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Topbar */
+.admin-topbar {
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #38bdf8;
+}
+
+/* Content */
+.admin-content {
+    padding: 40px;
+}
+
+.section-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #f8fafc;
+}
+
+.section-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.stat-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.stat-icon.vehicles { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.stat-icon.bookings { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+.stat-icon.revenue { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+
+.stat-details h3 {
+    font-size: 14px;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.stat-details p {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+/* Tables */
+.mt-40 { margin-top: 40px; }
+.text-center { text-align: center; }
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #f8fafc;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    background: rgba(30, 41, 59, 0.4);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 20px 25px;
+    text-align: left;
+}
+
+.admin-table th {
+    background: rgba(15, 23, 42, 0.4);
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 15px;
+}
+
+.admin-table tbody tr {
+    transition: background 0.3s;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge.completed { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+.badge.pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+.badge.cancelled { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+.badge.available { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+.badge.booked { background: rgba(167, 139, 250, 0.1); color: #a78bfa; }
+
+.vehicle-img-small {
+    width: 60px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    transform: translateY(-2px);
+}

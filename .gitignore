@@ -1,0 +1,5 @@
+.DS_Store
+.vs/
+Untitled.zip
+*.log
+config/config.php (if it contains secrets)
