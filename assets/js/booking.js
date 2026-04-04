@@ -96,6 +96,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const emailEl = document.getElementById('email');
             const contactEl = document.getElementById('contact');
             const locationSelect = document.getElementById('location-select');
+            
+            const colTypeEl = document.getElementById('collateral-type');
+            const colImageEl = document.getElementById('collateral-image');
+            const agreeEl = document.getElementById('agreement-checkbox');
 
             const errors = [];
             if (!fullNameEl?.value.trim()) errors.push('Full Name');
@@ -103,6 +107,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!contactEl?.value.trim()) errors.push('Contact');
             if (!pickupDate?.value) errors.push('Pickup Date');
             if (!returnDate?.value) errors.push('Return Date');
+            if (!colTypeEl?.value) errors.push('Collateral Type');
+            if (!colImageEl?.files?.length) errors.push('Collateral Image');
+            if (!agreeEl?.checked) errors.push('User Agreement');
 
             if (errors.length > 0) {
                 if (errorMessage) {
@@ -133,18 +140,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             // If logged in, attempt to create booking via API
             if (vehicleId) {
                 try {
+                    const formData = new FormData();
+                    formData.append('user_id', parseInt(userId));
+                    formData.append('vehicle_id', parseInt(vehicleId));
+                    formData.append('pickup_location_id', parseInt(locationId));
+                    formData.append('dropoff_location_id', parseInt(locationId));
+                    formData.append('start_date', pickupDate.value);
+                    formData.append('end_date', returnDate.value);
+                    formData.append('total_price', totalPrice);
+                    
+                    formData.append('collateral_type', colTypeEl.value);
+                    if (colImageEl.files[0]) {
+                        formData.append('collateral_image', colImageEl.files[0]);
+                    }
+                    formData.append('agreement_accepted', agreeEl.checked ? 'true' : 'false');
+
                     const bookingRes = await fetch('../api/bookings/create.php', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            user_id: parseInt(userId),
-                            vehicle_id: parseInt(vehicleId),
-                            pickup_location_id: parseInt(locationId),
-                            dropoff_location_id: parseInt(locationId),
-                            start_date: pickupDate.value,
-                            end_date: returnDate.value,
-                            total_price: totalPrice
-                        })
+                        headers: {
+                            'X-CSRF-Token': typeof csrfToken !== 'undefined' ? csrfToken : ''
+                        },
+                        body: formData
                     });
 
                     const bookingData = await bookingRes.json();

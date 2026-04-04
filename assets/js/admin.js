@@ -39,7 +39,7 @@ async function fetchRecentBookings() {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings yet.</td></tr>'; return; }
+        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings yet.</td></tr>'; return; }
         tbody.innerHTML = data.records.map(b => `
             <tr>
                 <td>#${b.id}</td>
@@ -49,10 +49,13 @@ async function fetchRecentBookings() {
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
+                <td>
+                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                </td>
             </tr>
         `).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found.</td></tr>';
     }
 }
 
@@ -131,7 +134,7 @@ async function fetchAllBookings() {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings.</td></tr>'; return; }
+        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings.</td></tr>'; return; }
         tbody.innerHTML = data.records.map(b => `
             <tr>
                 <td>#${b.id}</td>
@@ -141,10 +144,13 @@ async function fetchAllBookings() {
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
+                <td>
+                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                </td>
             </tr>
         `).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found.</td></tr>';
     }
 }
 
@@ -308,5 +314,58 @@ async function deleteVehicle(id) {
     } catch (err) {
         console.error(err);
         alert('An error occurred.');
+    }
+}
+
+// Collateral Review Logic
+function openCollateralModal(id, type, imageUrl, userName, status) {
+    document.getElementById('collateralModalTitle').innerText = 'Review ' + userName + '\'s Application';
+    document.getElementById('collateralModalImage').src = imageUrl || '../assets/images/car1.png';
+    document.getElementById('collateralModalDetails').innerText = 'Collateral Type: ' + (type || 'None Provided') + ' | Current Status: ' + status;
+
+    const approveBtn = document.getElementById('approveBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+
+    if (status !== 'pending') {
+        approveBtn.style.display = 'none';
+        rejectBtn.style.display = 'none';
+        document.getElementById('collateralModalDetails').innerText += ' (Action already taken)';
+    } else {
+        approveBtn.style.display = 'block';
+        rejectBtn.style.display = 'block';
+        approveBtn.onclick = () => reviewBookingApp(id, 'confirmed');
+        rejectBtn.onclick = () => reviewBookingApp(id, 'cancelled');
+    }
+
+    document.getElementById('collateralModal').style.display = 'flex';
+}
+
+function closeCollateralModal() {
+    document.getElementById('collateralModal').style.display = 'none';
+}
+
+async function reviewBookingApp(id, newStatus) {
+    if (!confirm('Are you sure you want to mark this application as ' + newStatus + '?')) return;
+    
+    try {
+        const res = await fetch('../api/bookings/update_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, status: newStatus })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('Application ' + newStatus + ' successfully.');
+            closeCollateralModal();
+            fetchRecentBookings();
+            fetchAllBookings();
+            fetchAdminStats();
+        } else {
+            alert(data.message || 'Failed to update application');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred while updating the status.');
     }
 }

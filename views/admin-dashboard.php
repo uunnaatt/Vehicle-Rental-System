@@ -65,10 +65,10 @@
                     <div class="table-responsive">
                         <table class="admin-table">
                             <thead>
-                                <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start</th><th>End</th><th>Total</th><th>Status</th></tr>
+                                <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start</th><th>End</th><th>Total</th><th>Status</th><th>Review App</th></tr>
                             </thead>
                             <tbody id="recent-bookings-body">
-                                <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                <tr><td colspan="8" class="text-center">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -107,10 +107,10 @@
                 <div class="table-responsive">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start Date</th><th>End Date</th><th>Total Price</th><th>Status</th></tr>
+                            <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start Date</th><th>End Date</th><th>Total Price</th><th>Status</th><th>Review App</th></tr>
                         </thead>
                         <tbody id="admin-bookings-body">
-                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                            <tr><td colspan="8" class="text-center">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -206,6 +206,22 @@
                 
                 <button type="submit" class="btn-primary" style="width:100%;">Save Vehicle</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Collateral Review Modal -->
+    <div id="collateralModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#1e293b; padding:20px; border-radius:15px; width:90%; max-width:600px; color:#fff; text-align:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="collateralModalTitle">Review Application</h3>
+                <button onclick="closeCollateralModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <img id="collateralModalImage" src="" alt="Collateral" style="max-width:100%; max-height:400px; object-fit:contain; border-radius:10px; margin-bottom:20px; background:#0f172a; padding:10px;">
+            <p id="collateralModalDetails" style="color:#94a3b8; font-size:14px; margin-bottom:20px;"></p>
+            <div style="display:flex; gap:10px; justify-content:center;" id="collateralActionBtns">
+                <button id="approveBtn" class="btn-primary" style="background:#10b981; border:none; cursor:pointer;">Approve</button>
+                <button id="rejectBtn" class="btn-primary" style="background:#ef4444; border:none; cursor:pointer;">Reject</button>
+            </div>
         </div>
     </div>
 

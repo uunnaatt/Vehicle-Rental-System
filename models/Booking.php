@@ -13,6 +13,9 @@ class Booking {
     public $end_date;
     public $total_price;
     public $status;
+    public $collateral_type;
+    public $collateral_image;
+    public $agreement_accepted;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -47,7 +50,9 @@ class Booking {
         $query = "INSERT INTO " . $this->table_name . " 
                   SET user_id=:user_id, vehicle_id=:vehicle_id, pickup_location_id=:pickup_location_id, 
                       dropoff_location_id=:dropoff_location_id, start_date=:start_date, 
-                      end_date=:end_date, total_price=:total_price, status=:status";
+                      end_date=:end_date, total_price=:total_price, status=:status, 
+                      collateral_type=:collateral_type, collateral_image=:collateral_image, 
+                      agreement_accepted=:agreement_accepted";
 
         $stmt = $this->conn->prepare($query);
 
@@ -61,6 +66,11 @@ class Booking {
         $stmt->bindParam(':end_date', $this->end_date);
         $stmt->bindParam(':total_price', $this->total_price);
         $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':collateral_type', $this->collateral_type);
+        $stmt->bindParam(':collateral_image', $this->collateral_image);
+        
+        $agreement = $this->agreement_accepted ? 1 : 0;
+        $stmt->bindParam(':agreement_accepted', $agreement, PDO::PARAM_INT);
 
         if($stmt->execute()) {
             return true;
@@ -86,7 +96,7 @@ class Booking {
 
     // Read all bookings
     public function read_all() {
-        $query = "SELECT b.id, b.start_date, b.end_date, b.total_price, b.status, 
+        $query = "SELECT b.id, b.start_date, b.end_date, b.total_price, b.status, b.collateral_type, b.collateral_image, b.agreement_accepted,
                          u.full_name as user_name, v.name as vehicle_name
                   FROM " . $this->table_name . " b
                   LEFT JOIN users u ON b.user_id = u.id
