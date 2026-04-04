@@ -18,6 +18,7 @@ class Vehicle {
     public $daily_rate;
     public $image_url;
     public $status;
+    public $description;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -92,6 +93,90 @@ class Vehicle {
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['total'];
+    }
+
+    // Create Vehicle
+    public function create() {
+        $query = "INSERT INTO " . $this->table_name . "
+                  SET name=:name, brand=:brand, model_year=:model_year, category_id=:category_id,
+                      location_id=:location_id, seats=:seats, transmission=:transmission,
+                      fuel_type=:fuel_type, daily_rate=:daily_rate, image_url=:image_url,
+                      status=:status, description=:description";
+
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->name = htmlspecialchars(strip_tags($this->name));
+        $this->brand = htmlspecialchars(strip_tags($this->brand));
+        $this->status = htmlspecialchars(strip_tags($this->status));
+
+        // bind values
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':brand', $this->brand);
+        $stmt->bindParam(':model_year', $this->model_year);
+        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':location_id', $this->location_id);
+        $stmt->bindParam(':seats', $this->seats);
+        $stmt->bindParam(':transmission', $this->transmission);
+        $stmt->bindParam(':fuel_type', $this->fuel_type);
+        $stmt->bindParam(':daily_rate', $this->daily_rate);
+        $stmt->bindParam(':image_url', $this->image_url);
+        $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':description', $this->description);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Update Vehicle
+    public function update() {
+        $query = "UPDATE " . $this->table_name . "
+                  SET name=:name, brand=:brand, model_year=:model_year, category_id=:category_id,
+                      location_id=:location_id, seats=:seats, transmission=:transmission,
+                      fuel_type=:fuel_type, daily_rate=:daily_rate, image_url=:image_url,
+                      status=:status, description=:description
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->name = htmlspecialchars(strip_tags($this->name));
+        $this->brand = htmlspecialchars(strip_tags($this->brand));
+
+        // bind values
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':brand', $this->brand);
+        $stmt->bindParam(':model_year', $this->model_year);
+        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':location_id', $this->location_id);
+        $stmt->bindParam(':seats', $this->seats);
+        $stmt->bindParam(':transmission', $this->transmission);
+        $stmt->bindParam(':fuel_type', $this->fuel_type);
+        $stmt->bindParam(':daily_rate', $this->daily_rate);
+        $stmt->bindParam(':image_url', $this->image_url);
+        $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':id', $this->id);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Delete Vehicle
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(1, $this->id);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 }
 ?>
