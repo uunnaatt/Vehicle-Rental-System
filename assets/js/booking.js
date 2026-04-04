@@ -10,6 +10,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const returnDate = document.getElementById('return-date');
     const priceDisplay = document.querySelector('.pay-amount');
 
+    // UI visual toggles for gender and rental duration buttons
+    const genderLabels = document.querySelectorAll('.gender-option');
+    genderLabels.forEach(label => {
+        label.addEventListener('click', () => {
+            genderLabels.forEach(l => l.classList.remove('active'));
+            label.classList.add('active');
+        });
+    });
+
+    const rentalBtns = document.querySelectorAll('.rental-btn');
+    rentalBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            rentalBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
     // Set min date to today
     const today = new Date().toISOString().split('T')[0];
     if (pickupDate) pickupDate.min = today;
