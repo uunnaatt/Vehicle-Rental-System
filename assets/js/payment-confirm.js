@@ -1,49 +1,56 @@
 // Get car data from URL
-const urlParams = new URLSearchParams(window.location.search);
-const carSlug = urlParams.get('car') || 'tesla-model-s';
-const pickupDate = localStorage.getItem('pickupDate') || '19 Jan 2024 at 10:30 AM';
-const returnDate = localStorage.getItem('returnDate') || '22 Jan 2024 at 05:00 PM';
-const customerName = localStorage.getItem('customerName') || 'Binayak Ghising';
-const carLocation = localStorage.getItem('carLocation') || 'Dharan, Sunsari'; // ✅ GET LOCATION
+document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    let vehicleId = urlParams.get('vehicle_id');
+    const carSlug = urlParams.get('car');
 
-// Car data
-const carsData = {
-    'tesla-model-s': { name: 'Tesla Model S', image: '../assets/images/tesla-black.png', price: 1000 },
-    'ferrari-laferrari': { name: 'Ferrari LaFerrari', image: '../assets/images/ferrari-red.png', price: 2500 },
-    'lamborghini': { name: 'Lamborghini', image: '../assets/images/lamborghini.png', price: 3000 },
-    'lamborghini-aventador': { name: 'Lamborghini Aventador', image: '../assets/images/lamborghini.png', price: 3000 },
-    'bmw-gts3-m2': { name: 'BMW GTS3 M2', image: '../assets/images/bmw-white.png', price: 2000 },
-    'ferrari-ff': { name: 'Ferrari-FF', image: '../assets/images/ferrari-ff.png', price: 2500 },
-    'kala-gadi': { name: 'Kalo Gadi', image: '../assets/images/car1.png', price: 1000 },
-    'nilo-gadi': { name: 'Nilo Gadi', image: '../assets/images/mazda-blue.png', price: 1000 },
-    'hariyo-gadi': { name: 'Hariyo Gaadi', image: '../assets/images/car3.png', price: 1000 }
-};
+    const pickupDate = localStorage.getItem('pickupDate') || '19 Jan 2026 at 10:30 AM';
+    const returnDate = localStorage.getItem('returnDate') || '22 Jan 2026 at 05:00 PM';
+    const customerName = localStorage.getItem('customerName') || 'Binayak Ghising';
+    const carLocation = localStorage.getItem('carLocation') || 'Dharan, Sunsari';
+    const calcTotalPrice = localStorage.getItem('totalPrice'); // Get dynamic price!
 
-const carData = carsData[carSlug] || carsData['tesla-model-s'];
+    // Fallback logic
+    if (!vehicleId && carSlug) {
+        const slugMap = { 'tesla-model-s': 12, 'ferrari-laferrari': 13, 'lamborghini': 1, 'bmw-gts3-m2': 13, 'ferrari-ff': 12, 'kala-gadi': 1, 'nilo-gadi': 2, 'hariyo-gadi': 3 };
+        vehicleId = slugMap[carSlug] || 12;
+    }
+    if (!vehicleId) vehicleId = 12;
 
-// Update page with car data
-document.getElementById('confirm-car-name').textContent = carData.name;
-document.getElementById('confirm-car-image').src = carData.image;
-document.getElementById('booking-name').textContent = customerName;
-document.getElementById('booking-pickup').textContent = pickupDate;
-document.getElementById('booking-return').textContent = returnDate;
-document.getElementById('booking-location').textContent = '@' + carLocation; // ✅ DISPLAY LOCATION
+    let baseDailyRate = 1000;
 
-// Generate random booking ID and Trx ID
-const bookingId = Math.floor(Math.random() * 90000) + 10000;
-const trxId = '#' + Math.random().toString(36).substring(2, 15);
+    // Fetch dynamic car details
+    try {
+        const res = await fetch(`../api/vehicles/read_single.php?id=${vehicleId}`);
+        if(res.ok) {
+            const data = await res.json();
+            document.getElementById('confirm-car-name').textContent = data.name.toUpperCase();
+            document.getElementById('confirm-car-image').src = data.image_url;
+            baseDailyRate = parseFloat(data.daily_rate);
+        }
+    } catch(e) { console.error('API Error:', e); }
 
-document.getElementById('booking-id').textContent = bookingId;
-document.getElementById('trx-id').textContent = trxId;
+    document.getElementById('booking-name').textContent = customerName;
+    document.getElementById('booking-pickup').textContent = pickupDate;
+    document.getElementById('booking-return').textContent = returnDate;
+    document.getElementById('booking-location').textContent = '@' + carLocation;
 
-// Calculate payment amounts
-const amount = carData.price;
-const serviceFee = Math.round(amount * 0.1); // 10% service fee
-const totalAmount = amount + serviceFee;
+    // Generate random booking ID and Trx ID
+    const bookingId = Math.floor(Math.random() * 90000) + 10000;
+    const trxId = '#' + Math.random().toString(36).substring(2, 15);
 
-document.getElementById('payment-amount').textContent = 'Rs. ' + amount;
-document.getElementById('service-fee').textContent = 'Rs. ' + serviceFee;
-document.getElementById('total-amount').textContent = 'Rs. ' + totalAmount;
+    document.getElementById('booking-id').textContent = bookingId;
+    document.getElementById('trx-id').textContent = trxId;
+
+    // Calculate final payment amounts (favor dynamic calculation first)
+    const amount = calcTotalPrice ? parseFloat(calcTotalPrice) : baseDailyRate;
+    const serviceFee = Math.round(amount * 0.1); // 10% service fee
+    const totalAmount = amount + serviceFee;
+
+    document.getElementById('payment-amount').textContent = 'Rs. ' + amount.toLocaleString();
+    document.getElementById('service-fee').textContent = 'Rs. ' + serviceFee.toLocaleString();
+    document.getElementById('total-amount').textContent = 'Rs. ' + totalAmount.toLocaleString();
+
 
 // Format card number with spaces
 const cardNumberInput = document.getElementById('card-number');
@@ -113,3 +120,4 @@ if (confirmPaymentBtn) {
         window.location.href = 'payment-success.php?car=' + carSlug;
     });
 }
+});
