@@ -16,6 +16,7 @@
         <div style="display:flex; gap:10px; margin-bottom:30px; flex-wrap:wrap;">
             <button class="tab-btn active" onclick="switchTab('bookings', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.3); color:#000; font-weight:600; cursor:pointer;">📅 My Bookings</button>
             <button class="tab-btn" onclick="switchTab('reviews', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.15); color:#000; font-weight:600; cursor:pointer;">⭐ My Reviews</button>
+            <button class="tab-btn" onclick="switchTab('support', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.15); color:#000; font-weight:600; cursor:pointer;">💬 Contact Support</button>
         </div>
 
         <!-- My Bookings -->
@@ -29,6 +30,19 @@
         <div id="tab-reviews" class="profile-tab" style="display:none;">
             <div id="reviews-list" style="display:flex; flex-direction:column; gap:20px;">
                 <p>Loading reviews...</p>
+            </div>
+        </div>
+
+        <!-- Support Chat -->
+        <div id="tab-support" class="profile-tab" style="display:none;">
+            <div style="background:rgba(255,255,255,0.2); border-radius:16px; padding:20px; height:400px; display:flex; flex-direction:column;">
+                <div id="chat-messages" style="flex:1; overflow-y:auto; margin-bottom:15px; display:flex; flex-direction:column; gap:10px; padding-right:10px;">
+                    <p style="opacity:0.7; text-align:center; font-size:14px; margin-top:20px;">Start a conversation with SAWARI Support...</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="chat-input" placeholder="Type your message..." style="flex:1; padding:12px 15px; border-radius:20px; border:none; background:rgba(255,255,255,0.4); color:#000; outline:none;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()" style="padding:12px 25px; border-radius:20px; border:none; background:#38bdf8; color:#0f172a; font-weight:700; cursor:pointer;">Send</button>
+                </div>
             </div>
         </div>
     </div>
@@ -50,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadReviews(userId);
 });
 
+let chatPollInterval = null;
+const adminId = 1;
+
 function switchTab(tab, btn) {
     document.querySelectorAll('.profile-tab').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.tab-btn').forEach(el => {
@@ -57,6 +74,14 @@ function switchTab(tab, btn) {
     });
     document.getElementById('tab-' + tab).style.display = 'block';
     btn.style.background = 'rgba(255,255,255,0.4)';
+
+    if (tab === 'support') {
+        loadChatMessages();
+        if(!chatPollInterval) chatPollInterval = setInterval(loadChatMessages, 3000);
+    } else {
+        if(chatPollInterval) clearInterval(chatPollInterval);
+        chatPollInterval = null;
+    }
 }
 
 async function loadBookings(userId) {
@@ -101,6 +126,38 @@ async function loadReviews(userId) {
     } catch(e) {
         container.innerHTML = '<p style="opacity:0.7;">Could not load reviews.</p>';
     }
+}
+
+async function loadChatMessages() {
+    const userId = localStorage.getItem('user_id');
+    const container = document.getElementById('chat-messages');
+    try {
+        const res = await fetch(`../api/chat/get.php?user1=${userId}&user2=${adminId}`);
+        const data = await res.json();
+        if(data.records && data.records.length > 0) {
+            container.innerHTML = data.records.map(m => {
+                const isMine = (m.sender_id == userId);
+                return `<div style="max-width:80%; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'#38bdf8':'rgba(255,255,255,0.3)'}; color:${isMine?'#0f172a':'#fff'}; padding:10px 15px; border-radius:15px; font-size:14px;">${m.message}</div>`;
+            }).join('');
+        }
+    } catch(e) {}
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    const userId = localStorage.getItem('user_id');
+    input.value = '';
+    
+    try {
+        await fetch('../api/chat/send.php', {
+            method: 'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ sender_id: userId, receiver_id: adminId, message: msg })
+        });
+        loadChatMessages();
+    } catch(e) {}
 }
 </script>
 

@@ -15,12 +15,19 @@ function showSection(sectionId, el) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     document.getElementById('section-' + sectionId).style.display = 'block';
     document.getElementById('section-heading').textContent =
-        { overview: 'Overview', vehicles: 'Manage Vehicles', bookings: 'All Bookings', reviews: 'Customer Reviews' }[sectionId] || sectionId;
+        { overview: 'Overview', vehicles: 'Manage Vehicles', bookings: 'All Bookings', reviews: 'Customer Reviews', inbox: 'Support Inbox' }[sectionId] || sectionId;
     if (el) el.closest('li').classList.add('active');
 
     if (sectionId === 'vehicles') fetchAdminVehicles();
     if (sectionId === 'bookings') fetchAllBookings();
     if (sectionId === 'reviews') fetchAllReviews();
+    if (sectionId === 'inbox') fetchInboxList();
+    
+    // Cleanup polling
+    if(sectionId !== 'inbox') {
+        if(window.adminChatPoll) clearInterval(window.adminChatPoll);
+        window.adminChatPoll = null;
+    }
 }
 
 async function fetchAdminStats() {
@@ -342,6 +349,72 @@ function openCollateralModal(id, type, imageUrl, userName, status) {
 
 function closeCollateralModal() {
     document.getElementById('collateralModal').style.display = 'none';
+}
+
+// ===== ADMIN INBOX CHAT SYSTEM =====
+let activeChatUserId = null;
+
+async function fetchInboxList() {
+    const list = document.getElementById('inbox-list');
+    try {
+        const res = await fetch('../api/chat/inbox.php');
+        const data = await res.json();
+        if(data.records && data.records.length > 0) {
+            list.innerHTML = data.records.map(r => `
+                <div onclick="openAdminChat(${r.id}, '${r.full_name}')" style="padding:15px 20px; border-bottom:1px solid rgba(255,255,255,0.05); cursor:pointer; hover:background:rgba(255,255,255,0.1);">
+                    <div style="font-weight:700; color:#e2e8f0;">${r.full_name}</div>
+                    <div style="font-size:12px; opacity:0.5; margin-top:4px;">User ID: ${r.id} | Active: ${r.last_msg_time || 'Just now'}</div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div style="padding:20px; opacity:0.5;">No active conversations.</div>';
+        }
+    } catch(e) { }
+}
+
+function openAdminChat(userId, userName) {
+    activeChatUserId = userId;
+    document.getElementById('active-chat-header').textContent = 'Chat with ' + userName;
+    document.getElementById('admin-chat-input').disabled = false;
+    document.getElementById('admin-chat-sendbtn').disabled = false;
+    
+    loadAdminChatMessages();
+    if(window.adminChatPoll) clearInterval(window.adminChatPoll);
+    window.adminChatPoll = setInterval(loadAdminChatMessages, 3000);
+}
+
+async function loadAdminChatMessages() {
+    if(!activeChatUserId) return;
+    const container = document.getElementById('admin-chat-messages');
+    try {
+        const adminId = 1; // Assuming Admin is 1
+        const res = await fetch(`../api/chat/get.php?user1=${activeChatUserId}&user2=${adminId}`);
+        const data = await res.json();
+        if(data.records) {
+            container.innerHTML = data.records.map(m => {
+                const isAdmin = (m.sender_id == adminId);
+                return `<div style="max-width:80%; align-self:${isAdmin?'flex-end':'flex-start'}; background:${isAdmin?'#38bdf8':'rgba(255,255,255,0.1)'}; color:${isAdmin?'#0f172a':'#fff'}; padding:10px 15px; border-radius:15px; font-size:14px;">${m.message}</div>`;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+    } catch(e) {}
+}
+
+async function sendAdminChat() {
+    if(!activeChatUserId) return;
+    const input = document.getElementById('admin-chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    
+    try {
+        await fetch('../api/chat/send.php', {
+            method: 'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ sender_id: 1, receiver_id: activeChatUserId, message: msg })
+        });
+        loadAdminChatMessages();
+    } catch(e) {}
 }
 
 async function reviewBookingApp(id, newStatus) {

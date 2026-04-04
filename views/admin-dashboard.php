@@ -13,6 +13,7 @@
             <li id="menu-vehicles"><a href="#" onclick="showSection('vehicles', this)"><i class="icon">🚘</i> Vehicles</a></li>
             <li id="menu-bookings"><a href="#" onclick="showSection('bookings', this)"><i class="icon">📅</i> Bookings</a></li>
             <li id="menu-reviews"><a href="#" onclick="showSection('reviews', this)"><i class="icon">⭐</i> Reviews</a></li>
+            <li id="menu-inbox"><a href="#" onclick="showSection('inbox', this)"><i class="icon">💬</i> Support Inbox</a></li>
             <li><a href="index.php"><i class="icon">🏠</i> Go to Site</a></li>
             <li><a href="#" onclick="logout()"><i class="icon">🚪</i> Logout</a></li>
         </ul>
@@ -120,6 +121,25 @@
             <div id="section-reviews" class="admin-section" style="display:none;">
                 <h1 class="section-title">Customer Reviews</h1>
                 <div id="admin-all-reviews" style="display:flex; flex-direction:column; gap:20px;">Loading...</div>
+            </div>
+
+            <!-- ===== INBOX ===== -->
+            <div id="section-inbox" class="admin-section" style="display:none;">
+                <h1 class="section-title">Support Inbox</h1>
+                <div style="display:grid; grid-template-columns:300px 1fr; gap:20px; height:600px; background:rgba(30,41,59,0.5); border-radius:20px; border:1px solid rgba(255,255,255,0.05); overflow:hidden;">
+                    <div style="border-right:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column;">
+                        <h3 style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.1);">Conversations</h3>
+                        <div id="inbox-list" style="flex:1; overflow-y:auto;">Loading...</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <h3 id="active-chat-header" style="padding:20px; margin:0; border-bottom:1px solid rgba(255,255,255,0.1);">Select a user to chat</h3>
+                        <div id="admin-chat-messages" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+                        <div style="padding:20px; border-top:1px solid rgba(255,255,255,0.1); display:flex; gap:10px;">
+                            <input type="text" id="admin-chat-input" placeholder="Type reply..." style="flex:1; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.2); color:#fff;" disabled onkeypress="if(event.key==='Enter') sendAdminChat()">
+                            <button id="admin-chat-sendbtn" onclick="sendAdminChat()" class="btn-primary" disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
