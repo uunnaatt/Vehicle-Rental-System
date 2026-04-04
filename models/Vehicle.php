@@ -178,5 +178,16 @@ class Vehicle {
         }
         return false;
     }
+    // Update specific status separately
+    public function update_status($id, $status) {
+        $query = "UPDATE " . $this->table_name . " SET status = :status WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $status = htmlspecialchars(strip_tags($status));
+        $id = htmlspecialchars(strip_tags($id));
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute()) { return true; }
+        return false;
+    }
 }
 ?>

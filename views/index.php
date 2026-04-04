@@ -18,22 +18,6 @@
                 <button class="carousel-arrow right">&#10095;</button>
             </div>
         </div>
-        <!-- Bottom: Search Bar -->
-        <div class="search-container">
-            <div class="search-bar">
-                <div class="search-field">
-                    <label>Pick Up Date</label>
-                    <input type="date" id="pickup-date">
-                </div>
-                <div class="search-divider"></div>
-                <div class="search-field">
-                    <label>Return Date</label>
-                    <input type="date" id="return-date">
-                </div>
-                <div class="search-divider"></div>
-                <button class="btn-search">Search Cars</button>
-            </div>
-        </div>
     </div>
 </main>
 

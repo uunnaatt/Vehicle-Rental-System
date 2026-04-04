@@ -47,6 +47,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const img = document.getElementById('booking-car-image');
                 if (img) img.src = vehicleData.image_url;
                 if (priceDisplay) priceDisplay.textContent = `Rs. ${dailyRate.toLocaleString()}/Day`;
+                
+                if (pickupDate && returnDate && !pickupDate.value) {
+                    const d = new Date();
+                    const tmrw = new Date();
+                    tmrw.setDate(d.getDate() + 1);
+                    pickupDate.value = d.toISOString().split('T')[0];
+                    returnDate.value = tmrw.toISOString().split('T')[0];
+                    updatePrice();
+                }
             }
         } catch (e) {
             console.warn('Could not load vehicle details:', e);
@@ -84,8 +93,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    if (pickupDate) pickupDate.addEventListener('change', updatePrice);
-    if (returnDate) returnDate.addEventListener('change', updatePrice);
+    if (pickupDate) {
+        pickupDate.addEventListener('change', updatePrice);
+        pickupDate.addEventListener('input', updatePrice);
+    }
+    if (returnDate) {
+        returnDate.addEventListener('change', updatePrice);
+        returnDate.addEventListener('input', updatePrice);
+    }
 
     // Pay button
     if (payBtn) {
