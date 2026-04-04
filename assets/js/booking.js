@@ -2,8 +2,23 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const vehicleId = urlParams.get('vehicle_id');
+    let vehicleId = urlParams.get('vehicle_id');
+    const carSlug = urlParams.get('car');
 
+    // Fallback logic for legacy hardcoded links
+    if (!vehicleId && carSlug) {
+        const slugMap = {
+            'tesla-model-s': 12,
+            'ferrari-laferrari': 13,
+            'lamborghini': 1,
+            'bmw-gts3-m2': 13,
+            'ferrari-ff': 12,
+            'kala-gadi': 1,
+            'nilo-gadi': 2,
+            'hariyo-gadi': 3
+        };
+        vehicleId = slugMap[carSlug] || 12; // default to Tesla
+    }
     const payBtn = document.getElementById('pay-btn');
     const errorMessage = document.getElementById('error-message');
     const pickupDate = document.getElementById('pickup-date');
