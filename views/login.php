@@ -1,4 +1,10 @@
-<?php include '../includes/header.php'; ?>
+<?php 
+session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+include '../includes/header.php'; 
+?>
 
 <main class="auth-section">
     <div class="auth-container">
@@ -47,6 +53,8 @@
 </main>
 
 <script>
+const csrfToken = "<?php echo $_SESSION['csrf_token']; ?>";
+
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -57,7 +65,8 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     fetch('../api/auth/login.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify({
             phone_or_email: phoneOrEmail,

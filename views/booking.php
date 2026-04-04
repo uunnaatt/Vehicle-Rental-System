@@ -25,19 +25,7 @@
                 </div>
             </div>
 
-            <!-- Book with Driver Toggle -->
-            <div class="form-group">
-                <div class="driver-toggle">
-                    <div>
-                        <span class="toggle-label">Book with driver</span>
-                        <p class="toggle-subtext">Don't have a driver? book with driver.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="driver-toggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+
 
             <!-- Personal Info -->
             <div class="form-group">
@@ -82,7 +70,7 @@
             </div>
 
             <!-- Error Message -->
-            <div class="error-message" id="error-message">
+            <div class="error-message" id="error-message" style="display: none;">
                 ⚠️ PLEASE FILL UP THE INFORMATION!!!
             </div>
 

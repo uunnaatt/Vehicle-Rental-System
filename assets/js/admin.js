@@ -83,9 +83,35 @@ function renderVehicleTable(vehicles) {
             <td>${v.category_name || '–'}</td>
             <td>${v.transmission}</td>
             <td>Rs. ${Number(v.daily_rate).toLocaleString()}</td>
-            <td><span class="badge ${v.status}">${v.status}</span></td>
+            <td>
+                <select class="status-dropdown badge ${v.status}" onchange="updateVehicleStatus(${v.id}, this)">
+                    <option value="Available" ${v.status === 'Available' ? 'selected' : ''}>Available</option>
+                    <option value="Maintenance" ${v.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+                    <option value="Rented" ${v.status === 'Rented' ? 'selected' : ''}>Rented</option>
+                </select>
+            </td>
         </tr>
     `).join('');
+}
+
+async function updateVehicleStatus(id, selectElement) {
+    const newStatus = selectElement.value;
+    selectElement.className = `status-dropdown badge ${newStatus}`;
+    try {
+        const res = await fetch('../api/vehicles/update_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, status: newStatus })
+        });
+        const data = await res.json();
+        if(!res.ok || !data.success) {
+            alert(data.message || 'Failed to update status');
+            // Revert changes in front end by re-fetching
+            fetchAdminVehicles();
+        }
+    } catch(e) {
+        alert('An error occurred while updating the status.');
+    }
 }
 
 function filterVehicles(category) {
