@@ -39,7 +39,7 @@ async function fetchRecentBookings() {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings yet.</td></tr>'; return; }
+        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings yet.</td></tr>'; return; }
         tbody.innerHTML = data.records.map(b => `
             <tr>
                 <td>#${b.id}</td>
@@ -49,10 +49,13 @@ async function fetchRecentBookings() {
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
+                <td>
+                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                </td>
             </tr>
         `).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found.</td></tr>';
     }
 }
 
@@ -89,6 +92,10 @@ function renderVehicleTable(vehicles) {
                     <option value="Maintenance" ${v.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
                     <option value="Rented" ${v.status === 'Rented' ? 'selected' : ''}>Rented</option>
                 </select>
+            </td>
+            <td>
+                <button onclick='editVehicle(${JSON.stringify(v).replace(/'/g, "&#39;")})' style="background:none;border:none;color:#38bdf8;cursor:pointer;margin-right:10px;">✎ Edit</button>
+                <button onclick="deleteVehicle(${v.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;">🗑 Delete</button>
             </td>
         </tr>
     `).join('');
@@ -127,7 +134,7 @@ async function fetchAllBookings() {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings.</td></tr>'; return; }
+        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings.</td></tr>'; return; }
         tbody.innerHTML = data.records.map(b => `
             <tr>
                 <td>#${b.id}</td>
@@ -137,10 +144,13 @@ async function fetchAllBookings() {
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
+                <td>
+                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                </td>
             </tr>
         `).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found.</td></tr>';
     }
 }
 
@@ -219,4 +229,143 @@ function toggleSidebar() {
 function logout() {
     localStorage.clear();
     window.location.href = '../views/login.php';
+}
+
+// Vehicle CRUD logic
+function openVehicleModal() {
+    document.getElementById('vehicleForm').reset();
+    document.getElementById('vehicle_id').value = '';
+    document.getElementById('existing_image_url').value = '';
+    document.getElementById('vehicleModalTitle').innerText = 'Add Vehicle';
+    document.getElementById('vehicleModal').style.display = 'flex';
+}
+
+function closeVehicleModal() {
+    document.getElementById('vehicleModal').style.display = 'none';
+}
+
+function editVehicle(v) {
+    document.getElementById('vehicleModalTitle').innerText = 'Edit Vehicle';
+    document.getElementById('vehicle_id').value = v.id;
+    document.getElementById('v_name').value = v.name;
+    document.getElementById('v_brand').value = v.brand;
+    document.getElementById('v_year').value = v.model_year;
+    // Map category string to roughly an ID if category is string, fallback to 1 
+    document.getElementById('v_category').value = v.category_id || 1; 
+    document.getElementById('v_location').value = v.location_id || 1;
+    document.getElementById('v_rate').value = v.daily_rate;
+    document.getElementById('v_seats').value = v.seats || 4;
+    document.getElementById('v_transmission').value = v.transmission;
+    document.getElementById('v_fuel').value = v.fuel_type;
+    document.getElementById('v_status').value = v.status;
+    document.getElementById('v_desc').value = v.description || '';
+    document.getElementById('existing_image_url').value = v.image_url || '';
+    document.getElementById('v_image_url').value = '';
+    document.getElementById('v_image_upload').value = '';
+    
+    document.getElementById('vehicleModal').style.display = 'flex';
+}
+
+async function saveVehicle(e) {
+    e.preventDefault();
+    const form = document.getElementById('vehicleForm');
+    const formData = new FormData(form);
+    
+    const id = formData.get('id');
+    const endpoint = id ? '../api/vehicles/update.php' : '../api/vehicles/create.php';
+
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert(data.message);
+            closeVehicleModal();
+            fetchAdminVehicles(); // refresh list
+        } else {
+            alert(data.message || 'Failed to save vehicle');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred.');
+    }
+}
+
+async function deleteVehicle(id) {
+    if (!confirm("Are you sure you want to delete this vehicle?")) return;
+    
+    try {
+        const res = await fetch('../api/vehicles/delete.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert(data.message);
+            fetchAdminVehicles(); // refresh list
+        } else {
+            alert(data.message || 'Failed to delete vehicle');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred.');
+    }
+}
+
+// Collateral Review Logic
+function openCollateralModal(id, type, imageUrl, userName, status) {
+    document.getElementById('collateralModalTitle').innerText = 'Review ' + userName + '\'s Application';
+    document.getElementById('collateralModalImage').src = imageUrl || '../assets/images/car1.png';
+    document.getElementById('collateralModalDetails').innerText = 'Collateral Type: ' + (type || 'None Provided') + ' | Current Status: ' + status;
+
+    const approveBtn = document.getElementById('approveBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+
+    if (status !== 'pending') {
+        approveBtn.style.display = 'none';
+        rejectBtn.style.display = 'none';
+        document.getElementById('collateralModalDetails').innerText += ' (Action already taken)';
+    } else {
+        approveBtn.style.display = 'block';
+        rejectBtn.style.display = 'block';
+        approveBtn.onclick = () => reviewBookingApp(id, 'confirmed');
+        rejectBtn.onclick = () => reviewBookingApp(id, 'cancelled');
+    }
+
+    document.getElementById('collateralModal').style.display = 'flex';
+}
+
+function closeCollateralModal() {
+    document.getElementById('collateralModal').style.display = 'none';
+}
+
+async function reviewBookingApp(id, newStatus) {
+    if (!confirm('Are you sure you want to mark this application as ' + newStatus + '?')) return;
+    
+    try {
+        const res = await fetch('../api/bookings/update_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, status: newStatus })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('Application ' + newStatus + ' successfully.');
+            closeCollateralModal();
+            fetchRecentBookings();
+            fetchAllBookings();
+            fetchAdminStats();
+        } else {
+            alert(data.message || 'Failed to update application');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred while updating the status.');
+    }
 }
