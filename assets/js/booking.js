@@ -1,6 +1,10 @@
 // assets/js/booking.js – enhanced to integrate API and price calculation
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('user_id')) {
+        window.location.href = 'login.php';
+        return;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     let vehicleId = urlParams.get('vehicle_id');
     const carSlug = urlParams.get('car');
@@ -164,8 +168,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
             const totalPrice = days * dailyRate;
-            const userId = localStorage.getItem('user_id') || 1;
+            const userId = localStorage.getItem('user_id');
             const locationId = locationSelect?.value || 1;
+
+            if (!userId) {
+                if (errorMessage) {
+                    errorMessage.textContent = '⚠️ You must be logged in to book a vehicle. Redirecting...';
+                    errorMessage.style.display = 'block';
+                }
+                setTimeout(() => window.location.href = 'login.php', 2000);
+                return;
+            }
 
             // If logged in, attempt to create booking via API
             if (vehicleId) {

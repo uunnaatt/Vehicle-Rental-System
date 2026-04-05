@@ -1,5 +1,8 @@
 // assets/js/category.js
-
+// Immediate auth check
+if (!localStorage.getItem('user_id')) {
+    window.location.href = 'login.php';
+}
 // Get category from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
 const categoryParam = urlParams.get('type') || '';

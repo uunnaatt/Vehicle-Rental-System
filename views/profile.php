@@ -50,7 +50,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const userId = localStorage.getItem('user_id') || '2';
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+        window.location.href = 'login.php';
+        return;
+    }
     const userName = localStorage.getItem('user_name') || 'Guest';
     const userEmail = localStorage.getItem('user_email') || '';
     const userRole = localStorage.getItem('user_role') || 'user';
