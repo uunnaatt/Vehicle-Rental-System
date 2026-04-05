@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('user_id')) {
+        window.location.href = 'login.php';
+        return;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     let vehicleId = urlParams.get('vehicle_id');
     const carSlug = urlParams.get('car');

@@ -1,4 +1,8 @@
 // assets/js/dashboard.js
+// Immediate auth check
+if (!localStorage.getItem('user_id')) {
+    window.location.href = 'login.php';
+}
 // Dashboard – loads vehicles from the live API
 
 let allVehicles = [];

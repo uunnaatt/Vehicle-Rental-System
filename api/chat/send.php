@@ -17,7 +17,7 @@ if (!empty($data->sender_id) && !empty($data->receiver_id) && !empty($data->mess
     $msg->sender_id = $data->sender_id;
     $msg->receiver_id = $data->receiver_id;
     $msg->message = $data->message;
-    
+
     if ($msg->send()) {
         http_response_code(201);
         echo json_encode(["message" => "Sent."]);
