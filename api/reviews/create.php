@@ -9,13 +9,20 @@ include_once '../../config/database.php';
 $database = new Database();
 $db = $database->getConnection();
 
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    exit;
+}
+
 $data = json_decode(file_get_contents("php://input"));
 
-if(!empty($data->user_id) && !empty($data->vehicle_id) && !empty($data->rating)) {
+if(!empty($data->vehicle_id) && !empty($data->rating)) {
     $query = "INSERT INTO reviews (user_id, vehicle_id, rating, comment) 
               VALUES (:user_id, :vehicle_id, :rating, :comment)";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $data->user_id);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
     $stmt->bindParam(':vehicle_id', $data->vehicle_id);
     $stmt->bindParam(':rating', $data->rating);
     $comment = !empty($data->comment) ? htmlspecialchars(strip_tags($data->comment)) : '';

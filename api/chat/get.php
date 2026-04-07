@@ -10,8 +10,15 @@ $database = new Database();
 $db = $database->getConnection();
 $msg = new Message($db);
 
-$u1 = isset($_GET['user1']) ? $_GET['user1'] : die();
-$u2 = isset($_GET['user2']) ? $_GET['user2'] : die(); // Often Admin is user 1 usually
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    exit;
+}
+
+$u1 = $_SESSION['user_id'];
+$u2 = isset($_GET['user2']) ? $_GET['user2'] : die(); // The other user in the conversation
 
 $stmt = $msg->get_chat($u1, $u2);
 $num = $stmt->rowCount();

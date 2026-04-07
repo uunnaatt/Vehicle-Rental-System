@@ -76,11 +76,11 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     .then(response => response.json().then(data => ({status: response.status, body: data})))
     .then(res => {
         if (res.status === 200) {
-            // Store user in localStorage
-            localStorage.setItem('user_id', res.body.user.id);
+            // Success - session is already set by login.php
+            // We can still store name for UI, but it's not for auth
             localStorage.setItem('user_name', res.body.user.full_name);
-            localStorage.setItem('user_email', res.body.user.phone_or_email);
             localStorage.setItem('user_role', res.body.user.role);
+
             // Redirect based on role
             if(res.body.user.role === 'admin') {
                 window.location.href = 'admin-dashboard.php';

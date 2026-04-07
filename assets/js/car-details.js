@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!localStorage.getItem('user_id')) {
+    try {
+        const authRes = await fetch('../api/auth/me.php');
+        if (!authRes.ok) throw new Error();
+    } catch {
         window.location.href = 'login.php';
         return;
     }

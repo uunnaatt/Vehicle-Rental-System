@@ -47,21 +47,32 @@
     </div>
     </nav>
     <script>
-    // Show correct nav state based on localStorage
+    // Show correct nav state based on secure session
     (function() {
-        const role = localStorage.getItem('user_role');
-        const name = localStorage.getItem('user_name');
-        if(role === 'admin') {
-            document.getElementById('nav-auth-guest').style.display = 'none';
-            document.getElementById('nav-auth-admin').style.display = 'flex';
-        } else if(role === 'user') {
-            document.getElementById('nav-auth-guest').style.display = 'none';
-            document.getElementById('nav-auth-user').style.display = 'flex';
-            document.getElementById('nav-username').textContent = name || 'Profile';
-        }
+        fetch('../api/auth/me.php')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    if (data.role === 'admin') {
+                        document.getElementById('nav-auth-guest').style.display = 'none';
+                        document.getElementById('nav-auth-admin').style.display = 'flex';
+                    } else {
+                        document.getElementById('nav-auth-guest').style.display = 'none';
+                        document.getElementById('nav-auth-user').style.display = 'flex';
+                        document.getElementById('nav-username').textContent = data.full_name || 'Profile';
+                    }
+                }
+            })
+            .catch(() => {});
     })();
-    function logoutUser() {
-        localStorage.clear();
-        window.location.href = 'index.php';
+
+    async function logoutUser() {
+        try {
+            await fetch('../api/auth/logout.php');
+            localStorage.clear();
+            window.location.href = 'index.php';
+        } catch (e) {
+            window.location.href = 'index.php';
+        }
     }
     </script>

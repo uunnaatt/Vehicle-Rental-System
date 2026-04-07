@@ -11,10 +11,17 @@ $database = new Database();
 $db = $database->getConnection();
 $msg = new Message($db);
 
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    exit;
+}
+
 $data = json_decode(file_get_contents("php://input"));
 
-if (!empty($data->sender_id) && !empty($data->receiver_id) && !empty($data->message)) {
-    $msg->sender_id = $data->sender_id;
+if (!empty($data->receiver_id) && !empty($data->message)) {
+    $msg->sender_id = $_SESSION['user_id'];
     $msg->receiver_id = $data->receiver_id;
     $msg->message = $data->message;
 

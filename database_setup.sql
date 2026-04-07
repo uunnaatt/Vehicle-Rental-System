@@ -111,36 +111,36 @@ INSERT INTO locations (name, address) VALUES
 INSERT INTO vehicles (name, brand, model_year, category_id, location_id, seats, transmission, fuel_type, daily_rate, image_url, status, description) VALUES
 
 -- SUVs (category_id=1)
-('Land Cruiser Prado', 'Toyota', 2022, 1, 1, 7, 'Automatic', 'Diesel', 18000.00, '../assets/images/car1.png', 'available', 'A luxurious, capable 7-seater SUV ideal for Nepal''s mountainous terrain.'),
-('Fortuner GR Sport', 'Toyota', 2023, 1, 1, 7, 'Automatic', 'Diesel', 15000.00, '../assets/images/car2.png', 'available', 'Premium SUV with sport-tuned suspension and panoramic sunroof.'),
-('Creta N-Line', 'Hyundai', 2023, 1, 2, 5, 'Automatic', 'Petrol', 9000.00, '../assets/images/car3.png', 'available', 'Sporty compact SUV with futuristic interior and advanced driver aids.'),
-('Tucson Hybrid', 'Hyundai', 2023, 1, 2, 5, 'Automatic', 'Hybrid', 11000.00, '../assets/images/car1.png', 'available', 'Eco-friendly mid-size SUV with adaptive cruise control and 360 camera.'),
-('XUV700', 'Mahindra', 2022, 1, 3, 7, 'Automatic', 'Diesel', 10000.00, '../assets/images/car2.png', 'available', 'Award-winning 7-seater with ADAS suite and panoramic sunroof.'),
-('Compass Limited', 'Jeep', 2023, 1, 4, 5, 'Automatic', 'Petrol', 13500.00, '../assets/images/car3.png', 'available', 'Iconic Jeep DNA in a premium compact SUV format.'),
-('Defender 110', 'Land Rover', 2022, 1, 1, 5, 'Automatic', 'Diesel', 25000.00, '../assets/images/car1.png', 'available', 'The ultimate luxury off-roader, engineered for any terrain.'),
+('Land Cruiser Prado', 'Toyota', 2022, 1, 1, 7, 'Automatic', 'Diesel', 18000.00, '../assets/images/land_cruiser.png', 'available', 'A luxurious, capable 7-seater SUV ideal for Nepal''s mountainous terrain.'),
+('Fortuner GR Sport', 'Toyota', 2023, 1, 1, 7, 'Automatic', 'Diesel', 15000.00, '../assets/images/land_cruiser.png', 'available', 'Premium SUV with sport-tuned suspension and panoramic sunroof.'),
+('Creta N-Line', 'Hyundai', 2023, 1, 2, 5, 'Automatic', 'Petrol', 9000.00, '../assets/images/land_cruiser.png', 'available', 'Sporty compact SUV with futuristic interior and advanced driver aids.'),
+('Tucson Hybrid', 'Hyundai', 2023, 1, 2, 5, 'Automatic', 'Hybrid', 11000.00, '../assets/images/land_cruiser.png', 'available', 'Eco-friendly mid-size SUV with adaptive cruise control and 360 camera.'),
+('XUV700', 'Mahindra', 2022, 1, 3, 7, 'Automatic', 'Diesel', 10000.00, '../assets/images/mahindra_thar.png', 'available', 'Award-winning 7-seater with ADAS suite and panoramic sunroof.'),
+('Compass Limited', 'Jeep', 2023, 1, 4, 5, 'Automatic', 'Petrol', 13500.00, '../assets/images/mahindra_thar.png', 'available', 'Iconic Jeep DNA in a premium compact SUV format.'),
+('Defender 110', 'Land Rover', 2022, 1, 1, 5, 'Automatic', 'Diesel', 25000.00, '../assets/images/mahindra_thar.png', 'available', 'The ultimate luxury off-roader, engineered for any terrain.'),
 
 -- Sedans (category_id=2)
-('Model 3 Performance', 'Tesla', 2023, 2, 1, 5, 'Automatic', 'Electric', 14000.00, '../assets/images/tesla-black.png', 'available', 'Fully electric sedan with ludicrous acceleration and autopilot.'),
-('Civic RS', 'Honda', 2022, 2, 2, 5, 'Manual', 'Petrol', 7500.00, '../assets/images/car3.png', 'available', 'Sporty and reliable sedan, best-seller in its class.'),
-('Camry Hybrid', 'Toyota', 2023, 2, 3, 5, 'Automatic', 'Hybrid', 9500.00, '../assets/images/car2.png', 'available', 'Premium hybrid sedan with exceptional fuel efficiency and comfort.'),
-('Elantra N', 'Hyundai', 2023, 2, 1, 5, 'Manual', 'Petrol', 8500.00, '../assets/images/car3.png', 'available', 'High-performance version of the popular Elantra sedan.'),
-('Model S Plaid', 'Tesla', 2023, 2, 5, 5, 'Automatic', 'Electric', 22000.00, '../assets/images/tesla-black.png', 'available', 'World''s fastest sedan with over 1,000 hp and 600 km range.'),
+('Model 3 Performance', 'Tesla', 2023, 2, 1, 5, 'Automatic', 'Electric', 14000.00, '../assets/images/tesla_model_3.png', 'available', 'Fully electric sedan with ludicrous acceleration and autopilot.'),
+('Civic RS', 'Honda', 2022, 2, 2, 5, 'Manual', 'Petrol', 7500.00, '../assets/images/honda_civic.png', 'available', 'Sporty and reliable sedan, best-seller in its class.'),
+('Camry Hybrid', 'Toyota', 2023, 2, 3, 5, 'Automatic', 'Hybrid', 9500.00, '../assets/images/honda_civic.png', 'available', 'Premium hybrid sedan with exceptional fuel efficiency and comfort.'),
+('Elantra N', 'Hyundai', 2023, 2, 1, 5, 'Manual', 'Petrol', 8500.00, '../assets/images/honda_civic.png', 'available', 'High-performance version of the popular Elantra sedan.'),
+('Model S Plaid', 'Tesla', 2023, 2, 5, 5, 'Automatic', 'Electric', 22000.00, '../assets/images/tesla_model_3.png', 'available', 'World''s fastest sedan with over 1,000 hp and 600 km range.'),
 ('3 Series M340i', 'BMW', 2022, 2, 4, 5, 'Automatic', 'Petrol', 19000.00, '../assets/images/bmw-white.png', 'available', 'Ultimate driving machine with inline-6 turbocharged engine.'),
-('City ZX', 'Honda', 2022, 2, 6, 5, 'Automatic', 'Petrol', 6500.00, '../assets/images/car1.png', 'available', 'Comfortable family sedan with excellent boot space.'),
+('City ZX', 'Honda', 2022, 2, 6, 5, 'Automatic', 'Petrol', 6500.00, '../assets/images/honda_civic.png', 'available', 'Comfortable family sedan with excellent boot space.'),
 
 -- Hatchbacks (category_id=3)
-('Thar Rock', 'Mahindra', 2023, 3, 3, 4, 'Manual', 'Diesel', 8000.00, '../assets/images/car2.png', 'available', 'Iconic off-road compact with fold-down roof for the adventure seekers.'),
-('Swift ZXi', 'Maruti', 2023, 3, 2, 5, 'Automatic', 'Petrol', 4500.00, '../assets/images/car3.png', 'available', 'Nepal''s most loved hatchback for city commuting.'),
-('i20 N Line', 'Hyundai', 2023, 3, 1, 5, 'Manual', 'Petrol', 5500.00, '../assets/images/car1.png', 'available', 'Sporty hatchback with dual-tone paint and sport seats.'),
-('Polo GTI', 'Volkswagen', 2022, 3, 5, 5, 'Automatic', 'Petrol', 6500.00, '../assets/images/car2.png', 'available', 'Hot hatch with 200+ HP in a compact footprint.'),
-('Grand i10 Nios', 'Hyundai', 2022, 3, 6, 5, 'Manual', 'Petrol', 4000.00, '../assets/images/car3.png', 'available', 'Budget-friendly, spacious hatchback perfect for families.'),
+('Thar Rock', 'Mahindra', 2023, 3, 3, 4, 'Manual', 'Diesel', 8000.00, '../assets/images/mahindra_thar.png', 'available', 'Iconic off-road compact with fold-down roof for the adventure seekers.'),
+('Swift ZXi', 'Maruti', 2023, 3, 2, 5, 'Automatic', 'Petrol', 4500.00, '../assets/images/vw_polo_gti.png', 'available', 'Nepal''s most loved hatchback for city commuting.'),
+('i20 N Line', 'Hyundai', 2023, 3, 1, 5, 'Manual', 'Petrol', 5500.00, '../assets/images/vw_polo_gti.png', 'available', 'Sporty hatchback with dual-tone paint and sport seats.'),
+('Polo GTI', 'Volkswagen', 2022, 3, 5, 5, 'Automatic', 'Petrol', 6500.00, '../assets/images/vw_polo_gti.png', 'available', 'Hot hatch with 200+ HP in a compact footprint.'),
+('Grand i10 Nios', 'Hyundai', 2022, 3, 6, 5, 'Manual', 'Petrol', 4000.00, '../assets/images/vw_polo_gti.png', 'available', 'Budget-friendly, spacious hatchback perfect for families.'),
 ('Mazda 2', 'Mazda', 2022, 3, 4, 5, 'Automatic', 'Petrol', 5000.00, '../assets/images/mazda-blue.png', 'available', 'Stylish Japanese hatchback with KODO soul-in-motion design.'),
 
 -- Pickups (category_id=4)
-('Hilux Revo', 'Toyota', 2022, 4, 3, 5, 'Manual', 'Diesel', 14000.00, '../assets/images/car1.png', 'available', 'Best-in-class pickup truck for both work and adventure.'),
-('Ranger Wildtrak', 'Ford', 2023, 4, 6, 5, 'Automatic', 'Diesel', 13500.00, '../assets/images/car2.png', 'available', 'High-riding pickup truck with rolling load cover and smart tech.'),
-('D-Max V-Cross', 'Isuzu', 2023, 4, 1, 5, 'Automatic', 'Diesel', 12000.00, '../assets/images/car3.png', 'available', 'Adventure-ready pickup, excellent for Himalayan expeditions.'),
-('L200 Triton', 'Mitsubishi', 2022, 4, 2, 5, 'Manual', 'Diesel', 11000.00, '../assets/images/car1.png', 'available', 'Reliable full-sized pickup with legendary 4WD capability.'),
+('Hilux Revo', 'Toyota', 2022, 4, 3, 5, 'Manual', 'Diesel', 14000.00, '../assets/images/ford_ranger.png', 'available', 'Best-in-class pickup truck for both work and adventure.'),
+('Ranger Wildtrak', 'Ford', 2023, 4, 6, 5, 'Automatic', 'Diesel', 13500.00, '../assets/images/ford_ranger.png', 'available', 'High-riding pickup truck with rolling load cover and smart tech.'),
+('D-Max V-Cross', 'Isuzu', 2023, 4, 1, 5, 'Automatic', 'Diesel', 12000.00, '../assets/images/ford_ranger.png', 'available', 'Adventure-ready pickup, excellent for Himalayan expeditions.'),
+('L200 Triton', 'Mitsubishi', 2022, 4, 2, 5, 'Manual', 'Diesel', 11000.00, '../assets/images/ford_ranger.png', 'available', 'Reliable full-sized pickup with legendary 4WD capability.'),
 ('BT-50', 'Mazda', 2022, 4, 4, 5, 'Manual', 'Diesel', 10500.00, '../assets/images/mazda-blue.png', 'available', 'Tough and dependable pickup with 3-tonne towing capacity.');
 
 -- Sample Bookings

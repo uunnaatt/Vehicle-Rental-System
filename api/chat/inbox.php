@@ -10,6 +10,13 @@ $database = new Database();
 $db = $database->getConnection();
 $msg = new Message($db);
 
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    exit;
+}
+
 $stmt = $msg->get_admin_inbox();
 $num = $stmt->rowCount();
 
