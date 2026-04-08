@@ -1,8 +1,18 @@
 // assets/js/admin.js – Enhanced Admin Panel
 
-document.addEventListener("DOMContentLoaded", () => {
-    const userName = localStorage.getItem('user_name') || 'Admin';
-    document.getElementById('admin-name').innerText = userName;
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('../api/auth/me.php');
+        const data = await res.json();
+        if (!data.authenticated || data.role !== 'admin') {
+            window.location.href = 'login.php';
+            return;
+        }
+        document.getElementById('admin-name').innerText = data.full_name || 'Admin';
+    } catch (e) {
+        window.location.href = 'login.php';
+        return;
+    }
 
     fetchAdminStats();
     fetchRecentBookings();
@@ -13,7 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
 function showSection(sectionId, el) {
     document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-    document.getElementById('section-' + sectionId).style.display = 'block';
+    
+    const section = document.getElementById('section-' + sectionId);
+    if (section) section.style.display = 'block';
+    
     document.getElementById('section-heading').textContent =
         { overview: 'Overview', vehicles: 'Manage Vehicles', bookings: 'All Bookings', reviews: 'Customer Reviews', inbox: 'Support Inbox' }[sectionId] || sectionId;
     if (el) el.closest('li').classList.add('active');
@@ -233,9 +246,14 @@ function toggleSidebar() {
     sidebar.style.width = sidebar.style.width === '0px' ? '280px' : '0px';
 }
 
-function logout() {
-    localStorage.clear();
-    window.location.href = '../views/login.php';
+async function logout() {
+    try {
+        await fetch('../api/auth/logout.php');
+        localStorage.clear();
+        window.location.href = '../views/login.php';
+    } catch (e) {
+        window.location.href = '../views/login.php';
+    }
 }
 
 // Vehicle CRUD logic
@@ -327,7 +345,11 @@ async function deleteVehicle(id) {
 // Collateral Review Logic
 function openCollateralModal(id, type, imageUrl, userName, status) {
     document.getElementById('collateralModalTitle').innerText = 'Review ' + userName + '\'s Application';
-    document.getElementById('collateralModalImage').src = imageUrl || '../assets/images/car1.png';
+    
+    // Use the secure proxy to fetch the image
+    const fileName = imageUrl ? imageUrl.split('/').pop() : '';
+    document.getElementById('collateralModalImage').src = fileName ? `../api/bookings/get_collateral.php?file=${fileName}` : '../assets/images/car1.png';
+    
     document.getElementById('collateralModalDetails').innerText = 'Collateral Type: ' + (type || 'None Provided') + ' | Current Status: ' + status;
 
     const approveBtn = document.getElementById('approveBtn');
@@ -387,13 +409,15 @@ async function loadAdminChatMessages() {
     if(!activeChatUserId) return;
     const container = document.getElementById('admin-chat-messages');
     try {
-        const adminId = 1; // Assuming Admin is 1
-        const res = await fetch(`../api/chat/get.php?user1=${activeChatUserId}&user2=${adminId}`);
+        const res = await fetch(`../api/chat/get.php?user2=${activeChatUserId}`);
         const data = await res.json();
         if(data.records) {
+            // Note: In secure session mode, user1 is always the person logged in (Admin)
+            // So we check sender_id == data.current_user_id or similar if we had it, 
+            // but for now we know if sender matches activeChatUserId it's the customer.
             container.innerHTML = data.records.map(m => {
-                const isAdmin = (m.sender_id == adminId);
-                return `<div style="max-width:80%; align-self:${isAdmin?'flex-end':'flex-start'}; background:${isAdmin?'#38bdf8':'rgba(255,255,255,0.1)'}; color:${isAdmin?'#0f172a':'#fff'}; padding:10px 15px; border-radius:15px; font-size:14px;">${m.message}</div>`;
+                const isCustomer = (m.sender_id == activeChatUserId);
+                return `<div style="max-width:80%; align-self:${isCustomer?'flex-start':'flex-end'}; background:${isCustomer?'rgba(255,255,255,0.1)':'#38bdf8'}; color:${isCustomer?'#fff':'#0f172a'}; padding:10px 15px; border-radius:15px; font-size:14px;">${m.message}</div>`;
             }).join('');
             container.scrollTop = container.scrollHeight;
         }
@@ -411,7 +435,7 @@ async function sendAdminChat() {
         await fetch('../api/chat/send.php', {
             method: 'POST',
             headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ sender_id: 1, receiver_id: activeChatUserId, message: msg })
+            body: JSON.stringify({ receiver_id: activeChatUserId, message: msg })
         });
         loadAdminChatMessages();
     } catch(e) {}

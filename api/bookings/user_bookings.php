@@ -9,8 +9,15 @@ include_once '../../models/Booking.php';
 $database = new Database();
 $db = $database->getConnection();
 
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    exit;
+}
+
 $booking = new Booking($db);
-$booking->user_id = isset($_GET['user_id']) ? $_GET['user_id'] : die();
+$booking->user_id = $_SESSION['user_id'];
 
 $stmt = $booking->read_user_bookings();
 $num = $stmt->rowCount();

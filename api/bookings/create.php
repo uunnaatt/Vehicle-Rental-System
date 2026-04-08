@@ -22,7 +22,13 @@ $db = $database->getConnection();
 $booking = new Booking($db);
 
 // We now expect form-data instead of json body
-if(!empty($_POST['user_id']) && !empty($_POST['vehicle_id']) && !empty($_POST['start_date']) && !empty($_POST['end_date'])) {
+if(!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(array("message" => "Unauthorized. Please log in first."));
+    exit;
+}
+
+if(!empty($_POST['vehicle_id']) && !empty($_POST['start_date']) && !empty($_POST['end_date'])) {
     
     // Validate agreement
     if (!isset($_POST['agreement_accepted']) || $_POST['agreement_accepted'] !== 'true') {
@@ -54,7 +60,7 @@ if(!empty($_POST['user_id']) && !empty($_POST['vehicle_id']) && !empty($_POST['s
         exit;
     }
 
-    $booking->user_id = $_POST['user_id'];
+    $booking->user_id = $_SESSION['user_id'];
     $booking->vehicle_id = $_POST['vehicle_id'];
     $booking->pickup_location_id = $_POST['pickup_location_id'] ?? 1;
     $booking->dropoff_location_id = $_POST['dropoff_location_id'] ?? 1;

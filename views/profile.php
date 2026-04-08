@@ -49,23 +49,22 @@
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const userId = localStorage.getItem('user_id');
-    if (!userId) {
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const authRes = await fetch('../api/auth/me.php');
+        if (!authRes.ok) throw new Error();
+        const data = await authRes.json();
+        
+        document.getElementById('profile-name').textContent = data.full_name || 'User';
+        document.getElementById('profile-role').textContent = data.role || 'user';
+        document.getElementById('profile-avatar').textContent = (data.full_name || 'U').charAt(0).toUpperCase();
+
+        loadBookings();
+        loadReviews();
+    } catch {
         window.location.href = 'login.php';
         return;
     }
-    const userName = localStorage.getItem('user_name') || 'Guest';
-    const userEmail = localStorage.getItem('user_email') || '';
-    const userRole = localStorage.getItem('user_role') || 'user';
-
-    document.getElementById('profile-name').textContent = userName;
-    document.getElementById('profile-email').textContent = userEmail;
-    document.getElementById('profile-role').textContent = userRole;
-    document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
-
-    loadBookings(userId);
-    loadReviews(userId);
 });
 
 let chatPollInterval = null;
@@ -88,13 +87,13 @@ function switchTab(tab, btn) {
     }
 }
 
-async function loadBookings(userId) {
+async function loadBookings() {
     const container = document.getElementById('bookings-list');
     try {
-        const res = await fetch(`../api/bookings/user_bookings.php?user_id=${userId}`);
+        const res = await fetch(`../api/bookings/user_bookings.php`);
         if(!res.ok) throw new Error('none');
         const data = await res.json();
-        if(!data.records?.length) { container.innerHTML = '<p style="opacity:0.7">No bookings yet. <a href="category.php" style="font-weight:700">Browse vehicles →</a></p>'; return; }
+        if(!data.records?.length) { container.innerHTML = '<p style="opacity:0.7">No bookings yet. <a href="dashboard.php" style="font-weight:700">Browse vehicles →</a></p>'; return; }
         container.innerHTML = data.records.map(b => `
             <div style="background:rgba(255,255,255,0.2); border-radius:16px; padding:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
                 <div>
@@ -110,7 +109,7 @@ async function loadBookings(userId) {
     }
 }
 
-async function loadReviews(userId) {
+async function loadReviews() {
     const container = document.getElementById('reviews-list');
     try {
         const res = await fetch('../api/reviews/read.php');
@@ -133,14 +132,13 @@ async function loadReviews(userId) {
 }
 
 async function loadChatMessages() {
-    const userId = localStorage.getItem('user_id');
     const container = document.getElementById('chat-messages');
     try {
-        const res = await fetch(`../api/chat/get.php?user1=${userId}&user2=${adminId}`);
+        const res = await fetch(`../api/chat/get.php?user2=${adminId}`);
         const data = await res.json();
         if(data.records && data.records.length > 0) {
             container.innerHTML = data.records.map(m => {
-                const isMine = (m.sender_id == userId);
+                const isMine = (m.receiver_id == adminId); // In user chat, if receiver is admin, it's mine
                 return `<div style="max-width:80%; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'#38bdf8':'rgba(255,255,255,0.3)'}; color:${isMine?'#0f172a':'#fff'}; padding:10px 15px; border-radius:15px; font-size:14px;">${m.message}</div>`;
             }).join('');
         }
@@ -151,14 +149,13 @@ async function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const msg = input.value.trim();
     if(!msg) return;
-    const userId = localStorage.getItem('user_id');
     input.value = '';
     
     try {
         await fetch('../api/chat/send.php', {
             method: 'POST',
             headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ sender_id: userId, receiver_id: adminId, message: msg })
+            body: JSON.stringify({ receiver_id: adminId, message: msg })
         });
         loadChatMessages();
     } catch(e) {}

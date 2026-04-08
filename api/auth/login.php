@@ -25,6 +25,10 @@ if(!empty($data->phone_or_email) && !empty($data->password)) {
     $user->password = $data->password; // Pass plaintext password to check in User::login()
 
     if($user->login()) {
+        $_SESSION['user_id'] = $user->id;
+        $_SESSION['role'] = $user->role;
+        $_SESSION['full_name'] = $user->full_name;
+
         http_response_code(200);
         echo json_encode(array(
             "message" => "Successful login.",

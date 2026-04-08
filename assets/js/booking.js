@@ -1,7 +1,10 @@
 // assets/js/booking.js – enhanced to integrate API and price calculation
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!localStorage.getItem('user_id')) {
+    try {
+        const authRes = await fetch('../api/auth/me.php');
+        if (!authRes.ok) throw new Error();
+    } catch {
         window.location.href = 'login.php';
         return;
     }
@@ -184,7 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (vehicleId) {
                 try {
                     const formData = new FormData();
-                    formData.append('user_id', parseInt(userId));
                     formData.append('vehicle_id', parseInt(vehicleId));
                     formData.append('pickup_location_id', parseInt(locationId));
                     formData.append('dropoff_location_id', parseInt(locationId));
