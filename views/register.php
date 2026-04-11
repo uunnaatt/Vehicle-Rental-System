@@ -48,6 +48,13 @@
 </main>
 
 <script>
+// Dynamic Phone/Email input length check
+document.getElementById('reg-phone-email')?.addEventListener('input', function() {
+    if (/^\d+$/.test(this.value) && this.value.length > 10) {
+        this.value = this.value.substring(0, 10);
+    }
+});
+
 document.getElementById('register-form').addEventListener('submit', function(e) {
     e.preventDefault();
     

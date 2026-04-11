@@ -6,6 +6,21 @@ fetch('../api/auth/me.php').then(res => {
 // Dashboard – loads vehicles from the live API
 
 let allVehicles = [];
+let isLoggedIn = false; // Cached auth state
+
+// Check auth status on load (non-blocking)
+fetch('../api/auth/me.php').then(r => r.ok ? r.json() : null).then(d => {
+    isLoggedIn = d?.authenticated === true;
+}).catch(() => {});
+
+function bookVehicle(e, vehicleId) {
+    e.stopPropagation();
+    if (!isLoggedIn) {
+        window.location.href = 'login.php';
+        return;
+    }
+    window.location.href = `booking.php?vehicle_id=${vehicleId}`;
+}
 
 async function loadAllVehicles() {
     try {
@@ -28,7 +43,7 @@ function createCarCard(car) {
     return `
         <div class="car-card" onclick="window.location.href='car-details.php?vehicle_id=${car.id}'" style="cursor:pointer;">
             <div class="car-card-image">
-                <img src="${car.image_url}" alt="${car.name}">
+                <img src="${car.image_url}" alt="${car.name}" onerror="this.src='../assets/images/car1.png'">
                 <button class="heart-btn" onclick="event.stopPropagation(); toggleHeart(this)">♡</button>
             </div>
             <div class="car-card-details">
@@ -46,7 +61,7 @@ function createCarCard(car) {
                 </div>
                 <div class="car-footer">
                     <span class="car-price">Rs. ${Number(car.daily_rate).toLocaleString()}<small>/Day</small></span>
-                    <button class="book-now-btn" onclick="event.stopPropagation(); window.location.href='booking.php?vehicle_id=${car.id}'">Book now</button>
+                    <button class="book-now-btn" onclick="event.stopPropagation(); bookVehicle(event, ${car.id})">Book now</button>
                 </div>
             </div>
         </div>

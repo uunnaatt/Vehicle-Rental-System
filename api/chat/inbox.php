@@ -11,6 +11,9 @@ $db = $database->getConnection();
 $msg = new Message($db);
 
 session_start();
+// This releases the session file lock so other requests can run in parallel
+session_write_close(); 
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(401);
     echo json_encode(["message" => "Unauthorized"]);

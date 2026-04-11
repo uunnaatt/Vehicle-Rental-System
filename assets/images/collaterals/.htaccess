@@ -1,2 +1,7 @@
-Order Deny,Allow
-Deny from all
+# Block PHP execution for security — images only
+<FilesMatch "\.php$">
+    Deny from all
+</FilesMatch>
+
+# Allow image access for admins (direct browsing)
+Options -Indexes

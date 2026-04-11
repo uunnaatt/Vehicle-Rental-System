@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
@@ -18,10 +19,10 @@
             <li class="dropdown">
                 <a href="#" class="nav-link">CATEGORY ▾</a>
                 <div class="dropdown-menu">
-                    <a href="category.php?type=SUV" class="dropdown-item">🚙 SUV</a>
-                    <a href="category.php?type=Sedan" class="dropdown-item">🚗 Sedan</a>
-                    <a href="category.php?type=Hatchback" class="dropdown-item">🚘 Hatchback</a>
-                    <a href="category.php?type=Pickup" class="dropdown-item">🛻 Pickup</a>
+                    <a href="category.php?type=SUV" class="dropdown-item"><i class="fa-solid fa-truck-field"></i> SUV</a>
+                    <a href="category.php?type=Sedan" class="dropdown-item"><i class="fa-solid fa-car"></i> Sedan</a>
+                    <a href="category.php?type=Hatchback" class="dropdown-item"><i class="fa-solid fa-car-side"></i> Hatchback</a>
+                    <a href="category.php?type=Pickup" class="dropdown-item"><i class="fa-solid fa-truck-pickup"></i> Pickup</a>
                 </div>
             </li>
             <li><a href="about.php" class="nav-link">ABOUT US</a></li>

@@ -59,18 +59,21 @@ async function fetchRecentBookings() {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
+        // Populate shared cache so Review modal works from Overview tab too
+        if (data.records?.length) adminBookingsCache = data.records;
         if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings yet.</td></tr>'; return; }
         tbody.innerHTML = data.records.map(b => `
             <tr>
                 <td>#${b.id}</td>
-                <td>${b.user_name}</td>
+                <td><a href="#" onclick="openUserModal(event, ${b.user_id}, ${b.id})" style="color:#38bdf8; text-decoration:none; font-weight:600;">${b.user_name}</a></td>
+                <td style="font-size:12px;">${b.user_account_email || '—'}</td>
                 <td>${b.vehicle_name}</td>
                 <td>${b.start_date}</td>
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
                 <td>
-                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                    <button onclick='openCollateralModal(${b.id})' style="background:none; border:none; color:#38bdf8; cursor:pointer;"><i class="fa-solid fa-magnifying-glass"></i> Review</button>
                 </td>
             </tr>
         `).join('');
@@ -148,24 +151,28 @@ function filterVehicles(category) {
     renderVehicleTable(filtered);
 }
 
+let adminBookingsCache = [];
+
 async function fetchAllBookings() {
     const tbody = document.getElementById('admin-bookings-body');
     try {
         const res = await fetch('../api/bookings/admin_all.php');
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (!data.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings.</td></tr>'; return; }
-        tbody.innerHTML = data.records.map(b => `
+        adminBookingsCache = data.records || [];
+        if (!adminBookingsCache.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bookings.</td></tr>'; return; }
+        tbody.innerHTML = adminBookingsCache.map(b => `
             <tr>
                 <td>#${b.id}</td>
-                <td>${b.user_name}</td>
+                <td><a href="#" onclick="openUserModal(event, ${b.user_id}, ${b.id})" style="color:#38bdf8; text-decoration:none; font-weight:600;">${b.user_name}</a></td>
+                <td style="font-size:12px;">${b.user_account_email || '—'}</td>
                 <td>${b.vehicle_name}</td>
                 <td>${b.start_date}</td>
                 <td>${b.end_date}</td>
                 <td>Rs. ${Number(b.total_price).toLocaleString()}</td>
                 <td><span class="badge ${b.status}">${b.status}</span></td>
                 <td>
-                    <button onclick='openCollateralModal(${b.id}, "${b.collateral_type}", "${b.collateral_image}", "${b.user_name}", "${b.status}")' style="background:none; border:none; color:#38bdf8; cursor:pointer;">🔍 Review</button>
+                    <button onclick='openCollateralModal(${b.id})' style="background:none; border:none; color:#38bdf8; cursor:pointer;"><i class="fa-solid fa-magnifying-glass"></i> Review</button>
                 </td>
             </tr>
         `).join('');
@@ -185,7 +192,7 @@ async function fetchAllReviews() {
             <div style="background:rgba(30,41,59,0.5); border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
                     <div><strong style="color:#f8fafc;">${r.reviewer_name}</strong><span style="opacity:0.5; margin-left:10px; font-size:13px;">on ${r.vehicle_name || 'Vehicle'}</span></div>
-                    <span style="color:#f59e0b; font-size:16px; letter-spacing:2px">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                    <span style="color:#f59e0b; font-size:16px; letter-spacing:2px">${'<i class="fa-solid fa-star"></i>'.repeat(r.rating)}${'<i class="fa-regular fa-star"></i>'.repeat(5-r.rating)}</span>
                 </div>
                 <p style="color:#cbd5e1; font-size:14px; line-height:1.7;">"${r.comment}"</p>
                 <p style="font-size:12px; color:#64748b; margin-top:8px;">${r.created_at?.split(' ')[0] || ''}</p>
@@ -233,7 +240,7 @@ async function loadReviewsPreview() {
             <div style="margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.05);">
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                     <span style="font-weight:600; font-size:14px; color:#f8fafc;">${r.reviewer_name}</span>
-                    <span style="color:#f59e0b; font-size:13px">${'★'.repeat(r.rating)}</span>
+                    <span style="color:#f59e0b; font-size:13px">${'<i class="fa-solid fa-star"></i>'.repeat(r.rating)}</span>
                 </div>
                 <p style="font-size:13px; color:#94a3b8; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">"${r.comment}"</p>
             </div>
@@ -342,15 +349,39 @@ async function deleteVehicle(id) {
     }
 }
 
-// Collateral Review Logic
-function openCollateralModal(id, type, imageUrl, userName, status) {
-    document.getElementById('collateralModalTitle').innerText = 'Review ' + userName + '\'s Application';
-    
+// Collateral Review Logic — now receives full booking object
+function openCollateralModal(id) {
+    const b = adminBookingsCache.find(x => x.id == id);
+    if (!b) return;
+
+    const bookingId  = b.id;
+    const type       = b.collateral_type;
+    const imageUrl   = b.collateral_image;
+    const userName   = b.user_name;
+    const status     = b.status;
+
+    document.getElementById('collateralModalTitle').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Booking #' + bookingId + ' &ndash; ' + userName;
+
+    // Populate booker info panel
+    const infoHtml = `
+        <table style="width:100%; border-collapse:collapse;">
+            <tr><td style="opacity:0.6; width:140px;"><i class="fa-solid fa-user"></i> Account Name</td><td><strong><a href="#" onclick="openUserModal(event, ${b.user_id}, ${b.id})" style="color:#38bdf8; text-decoration:none;">${userName || '—'}</a></strong></td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-solid fa-envelope"></i> Account Email</td><td>${b.user_account_email || '—'}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-regular fa-clipboard"></i> Booking Name</td><td>${b.booking_name || '—'}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-regular fa-envelope"></i> Booking Email</td><td>${b.booking_email || '—'}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-solid fa-phone"></i> Phone</td><td>${b.booking_phone || '—'}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-solid fa-id-card"></i> Collateral</td><td>${type || '—'}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-regular fa-calendar"></i> Dates</td><td>${b.start_date} &rarr; ${b.end_date}</td></tr>
+            <tr><td style="opacity:0.6;"><i class="fa-solid fa-money-bill"></i> Total</td><td>Rs. ${Number(b.total_price).toLocaleString()}</td></tr>
+        </table>
+    `;
+    document.getElementById('collateralBookerInfo').innerHTML = infoHtml;
+
     // Use the secure proxy to fetch the image
     const fileName = imageUrl ? imageUrl.split('/').pop() : '';
     document.getElementById('collateralModalImage').src = fileName ? `../api/bookings/get_collateral.php?file=${fileName}` : '../assets/images/car1.png';
-    
-    document.getElementById('collateralModalDetails').innerText = 'Collateral Type: ' + (type || 'None Provided') + ' | Current Status: ' + status;
+
+    document.getElementById('collateralModalDetails').innerText = 'Current Status: ' + status;
 
     const approveBtn = document.getElementById('approveBtn');
     const rejectBtn = document.getElementById('rejectBtn');
@@ -362,8 +393,8 @@ function openCollateralModal(id, type, imageUrl, userName, status) {
     } else {
         approveBtn.style.display = 'block';
         rejectBtn.style.display = 'block';
-        approveBtn.onclick = () => reviewBookingApp(id, 'confirmed');
-        rejectBtn.onclick = () => reviewBookingApp(id, 'cancelled');
+        approveBtn.onclick = () => reviewBookingApp(bookingId, 'confirmed');
+        rejectBtn.onclick = () => reviewBookingApp(bookingId, 'cancelled');
     }
 
     document.getElementById('collateralModal').style.display = 'flex';
@@ -371,6 +402,69 @@ function openCollateralModal(id, type, imageUrl, userName, status) {
 
 function closeCollateralModal() {
     document.getElementById('collateralModal').style.display = 'none';
+}
+
+// ==========================================
+// User Modal Logic
+// ==========================================
+function closeUserModal() {
+    document.getElementById('userModal').style.display = 'none';
+}
+
+async function openUserModal(e, userId, bookingId = null) {
+    e.preventDefault();
+    const modal = document.getElementById('userModal');
+    const content = document.getElementById('userModalContent');
+    
+    modal.style.display = 'flex';
+    content.innerHTML = '<p style="text-align:center; opacity:0.7;">Fetching user details...</p>';
+
+    if (!userId) {
+        content.innerHTML = '<p style="color:#ef4444;">Error: User ID is missing.</p>';
+        return;
+    }
+
+    try {
+        const res = await fetch(`../api/users/read_single.php?id=${userId}`);
+        const data = await res.json();
+        
+        if (!res.ok) {
+            content.innerHTML = `<p style="color:#ef4444;">${data.message || 'Error fetching user'}</p>`;
+            return;
+        }
+
+        let collateralHtml = '';
+        if (bookingId && typeof adminBookingsCache !== 'undefined') {
+            const booking = adminBookingsCache.find(b => b.id == bookingId);
+            if (booking && booking.collateral_type) {
+                let imgHtml = '';
+                if (booking.collateral_image) {
+                    imgHtml = `<img src="${booking.collateral_image}" alt="Collateral" style="max-width:100%; max-height:200px; border-radius:8px; margin-top:10px; border:1px solid rgba(255,255,255,0.1);">`;
+                }
+                collateralHtml = `
+                    <div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); padding:15px; border-radius:10px; margin-top:15px;">
+                        <h4 style="margin:0 0 10px 0; color:#e0f2fe;"><i class="fa-solid fa-id-card"></i> Booking #${bookingId} Collateral</h4>
+                        <p style="margin:0; font-size:14px;"><strong style="color:#94a3b8;">Type:</strong> <span style="text-transform:capitalize;">${booking.collateral_type}</span></p>
+                        ${imgHtml}
+                    </div>
+                `;
+            }
+        }
+
+        content.innerHTML = `
+            <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
+                <p style="margin-bottom:10px;"><strong style="color:#94a3b8; display:inline-block; width:100px;"><i class="fa-solid fa-hashtag"></i> ID:</strong> ${data.id}</p>
+                <p style="margin-bottom:10px;"><strong style="color:#94a3b8; display:inline-block; width:100px;"><i class="fa-solid fa-user"></i> Name:</strong> <span style="font-size:16px; font-weight:600; color:#fff;">${data.full_name}</span></p>
+                <p style="margin-bottom:10px;"><strong style="color:#94a3b8; display:inline-block; width:100px;"><i class="fa-solid fa-envelope"></i> Contact:</strong> ${data.phone_or_email}</p>
+                <p style="margin-bottom:10px;"><strong style="color:#94a3b8; display:inline-block; width:100px;"><i class="fa-solid fa-shield-halved"></i> Role:</strong> <span style="text-transform:uppercase; font-size:12px; background:#1e293b; padding:4px 8px; border-radius:4px; border:1px solid #334155;">${data.role}</span></p>
+                <p style="margin-bottom:0;"><strong style="color:#94a3b8; display:inline-block; width:100px;"><i class="fa-regular fa-clock"></i> Joined:</strong> ${data.created_at}</p>
+            </div>
+            ${collateralHtml}
+        `;
+
+    } catch (err) {
+        content.innerHTML = '<p style="color:#ef4444;">Failed to communicate with server.</p>';
+    }
 }
 
 // ===== ADMIN INBOX CHAT SYSTEM =====
@@ -391,7 +485,9 @@ async function fetchInboxList() {
         } else {
             list.innerHTML = '<div style="padding:20px; opacity:0.5;">No active conversations.</div>';
         }
-    } catch(e) { }
+    } catch(e) { 
+        list.innerHTML = '<div style="padding:20px; opacity:0.5; color:#ef4444;">Error loading conversations.</div>';
+    }
 }
 
 function openAdminChat(userId, userName) {

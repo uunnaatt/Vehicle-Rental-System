@@ -55,6 +55,13 @@ include '../includes/header.php';
 <script>
 const csrfToken = "<?php echo $_SESSION['csrf_token']; ?>";
 
+// Dynamic Phone/Email input length check
+document.getElementById('log-phone-email')?.addEventListener('input', function() {
+    if (/^\d+$/.test(this.value) && this.value.length > 10) {
+        this.value = this.value.substring(0, 10);
+    }
+});
+
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
     

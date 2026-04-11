@@ -1,4 +1,11 @@
-<?php include '../includes/header.php'; ?>
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+include '../includes/header.php'; ?>
+
 
 <main class="payment-success-page">
     <div class="payment-success-container">
