@@ -12,8 +12,11 @@ $db = $database->getConnection();
 $msg = new Message($db);
 
 session_start();
+
+// 1. Fixed conflict here: Assigned variable and closed session early
 $senderId = $_SESSION['user_id'] ?? null;
-session_write_close(); // Release session lock immediately after reading user_id
+session_write_close(); 
+
 if (!$senderId) {
     http_response_code(401);
     echo json_encode(["message" => "Unauthorized"]);
@@ -23,6 +26,7 @@ if (!$senderId) {
 $data = json_decode(file_get_contents("php://input"));
 
 if (!empty($data->receiver_id) && !empty($data->message)) {
+    // 2. Fixed conflict here: Used the $senderId variable assigned above
     $msg->sender_id = $senderId;
     $msg->receiver_id = $data->receiver_id;
     $msg->message = $data->message;
