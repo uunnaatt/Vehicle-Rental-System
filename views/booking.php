@@ -1,8 +1,5 @@
 <?php 
-session_start();
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+include '../includes/auth_guard.php';
 include '../includes/header.php'; 
 ?>
 <main class="booking-page">
@@ -11,24 +8,6 @@ include '../includes/header.php';
         <div class="booking-form">
             <h1 class="booking-title" id="booking-car-name">TESLA MODEL - S</h1>
 
-            <!-- Gender Selection -->
-            <div class="form-group">
-                <label class="form-label">Gender</label>
-                <div class="gender-options">
-                    <label class="gender-option">
-                        <input type="radio" name="gender" value="male">
-                        <span>👨 Male</span>
-                    </label>
-                    <label class="gender-option">
-                        <input type="radio" name="gender" value="female">
-                        <span>👩 Female</span>
-                    </label>
-                    <label class="gender-option">
-                        <input type="radio" name="gender" value="others">
-                        <span>👤 Others</span>
-                    </label>
-                </div>
-            </div>
 
 
 
@@ -40,7 +19,7 @@ include '../includes/header.php';
                 <input type="email" class="form-input" placeholder="Email Address*" id="email" required>
             </div>
             <div class="form-group">
-                <input type="tel" class="form-input" placeholder="Contact*" id="contact" required>
+                <input type="tel" class="form-input" placeholder="Contact*" id="contact" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
             </div>
 
             <!-- Rental Date & Time -->

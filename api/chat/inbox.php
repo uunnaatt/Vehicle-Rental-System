@@ -11,6 +11,7 @@ $db = $database->getConnection();
 $msg = new Message($db);
 
 session_start();
+session_write_close(); // Read-only: release lock immediately!
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(401);
     echo json_encode(["message" => "Unauthorized"]);

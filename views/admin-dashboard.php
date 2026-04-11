@@ -1,4 +1,7 @@
-<?php include '../includes/header.php'; ?>
+<?php 
+include '../includes/auth_guard_admin.php';
+include '../includes/header.php'; 
+?>
 
 <link rel="stylesheet" href="../assets/css/admin.css">
 
@@ -6,16 +9,16 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="sidebar-header">
-            <h2>🚗 Sawari Admin</h2>
+            <h2><i class="fa-solid fa-car"></i> Sawari Admin</h2>
         </div>
         <ul class="sidebar-menu">
-            <li class="active" id="menu-overview"><a href="#" onclick="showSection('overview', this)"><i class="icon">📊</i> Overview</a></li>
-            <li id="menu-vehicles"><a href="#" onclick="showSection('vehicles', this)"><i class="icon">🚘</i> Vehicles</a></li>
-            <li id="menu-bookings"><a href="#" onclick="showSection('bookings', this)"><i class="icon">📅</i> Bookings</a></li>
-            <li id="menu-reviews"><a href="#" onclick="showSection('reviews', this)"><i class="icon">⭐</i> Reviews</a></li>
-            <li id="menu-inbox"><a href="#" onclick="showSection('inbox', this)"><i class="icon">💬</i> Support Inbox</a></li>
-            <li><a href="index.php"><i class="icon">🏠</i> Go to Site</a></li>
-            <li><a href="#" onclick="logout()"><i class="icon">🚪</i> Logout</a></li>
+            <li class="active" id="menu-overview"><a href="#" onclick="showSection('overview', this)"><i class="fa-solid fa-chart-line icon"></i> Overview</a></li>
+            <li id="menu-vehicles"><a href="#" onclick="showSection('vehicles', this)"><i class="fa-solid fa-car icon"></i> Vehicles</a></li>
+            <li id="menu-bookings"><a href="#" onclick="showSection('bookings', this)"><i class="fa-regular fa-calendar-check icon"></i> Bookings</a></li>
+            <li id="menu-reviews"><a href="#" onclick="showSection('reviews', this)"><i class="fa-solid fa-star icon"></i> Reviews</a></li>
+            <li id="menu-inbox"><a href="#" onclick="showSection('inbox', this)"><i class="fa-regular fa-comments icon"></i> Support Inbox</a></li>
+            <li><a href="index.php"><i class="fa-solid fa-house icon"></i> Go to Site</a></li>
+            <li><a href="#" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket icon"></i> Logout</a></li>
         </ul>
     </aside>
 
@@ -36,15 +39,15 @@
             <div id="section-overview" class="admin-section">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon vehicles">🚘</div>
+                        <div class="stat-icon vehicles"><i class="fa-solid fa-car"></i></div>
                         <div class="stat-details"><h3>Total Vehicles</h3><p id="stat-vehicles">–</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon bookings">📅</div>
+                        <div class="stat-icon bookings"><i class="fa-regular fa-calendar-check"></i></div>
                         <div class="stat-details"><h3>Total Bookings</h3><p id="stat-bookings">–</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon revenue">💰</div>
+                        <div class="stat-icon revenue"><i class="fa-solid fa-money-bill-wave"></i></div>
                         <div class="stat-details"><h3>Total Revenue</h3><p id="stat-revenue">–</p></div>
                     </div>
                 </div>
@@ -52,7 +55,7 @@
                 <!-- Quick charts placeholder -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:40px;">
                     <div style="background:rgba(30,41,59,0.5); border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,0.05);">
-                        <h3 style="margin-bottom:20px; color:#f8fafc;">📋 Category Breakdown</h3>
+                        <h3 style="margin-bottom:20px; color:#f8fafc;"><i class="fa-solid fa-list"></i> Category Breakdown</h3>
                         <div id="category-breakdown">Loading...</div>
                     </div>
                     <div style="background:rgba(30,41,59,0.5); border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,0.05);">
@@ -66,7 +69,7 @@
                     <div class="table-responsive">
                         <table class="admin-table">
                             <thead>
-                                <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start</th><th>End</th><th>Total</th><th>Status</th><th>Review App</th></tr>
+                                <tr><th>ID</th><th>Customer</th><th>Email</th><th>Vehicle</th><th>Start</th><th>End</th><th>Total</th><th>Status</th><th>Review App</th></tr>
                             </thead>
                             <tbody id="recent-bookings-body">
                                 <tr><td colspan="8" class="text-center">Loading...</td></tr>
@@ -108,7 +111,7 @@
                 <div class="table-responsive">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Start Date</th><th>End Date</th><th>Total Price</th><th>Status</th><th>Review App</th></tr>
+                            <tr><th>ID</th><th>Customer</th><th>Email</th><th>Vehicle</th><th>Start Date</th><th>End Date</th><th>Total Price</th><th>Status</th><th>Review App</th></tr>
                         </thead>
                         <tbody id="admin-bookings-body">
                             <tr><td colspan="8" class="text-center">Loading...</td></tr>
@@ -229,14 +232,28 @@
         </div>
     </div>
 
-    <!-- Collateral Review Modal -->
+    <div id="userModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1100; align-items:center; justify-content:center;">
+        <div style="background:#1e293b; padding:30px; border-radius:15px; width:90%; max-width:500px; color:#fff; text-align:left; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+                <h3 style="margin:0;"><i class="fa-solid fa-user-circle" style="color:#38bdf8; margin-right:8px;"></i> Customer Information</h3>
+                <button onclick="closeUserModal()" style="background:none; border:none; color:#94a3b8; font-size:24px; cursor:pointer; padding:0;">&times;</button>
+            </div>
+            <div id="userModalContent" style="display:flex; flex-direction:column; gap:15px; font-size:15px;">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
     <div id="collateralModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#1e293b; padding:20px; border-radius:15px; width:90%; max-width:600px; color:#fff; text-align:center;">
+        <div style="background:#1e293b; padding:20px; border-radius:15px; width:90%; max-width:620px; color:#fff; text-align:center;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <h3 id="collateralModalTitle">Review Application</h3>
                 <button onclick="closeCollateralModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
             </div>
-            <img id="collateralModalImage" src="" alt="Collateral" style="max-width:100%; max-height:400px; object-fit:contain; border-radius:10px; margin-bottom:20px; background:#0f172a; padding:10px;">
+            <!-- Booker details -->
+            <div id="collateralBookerInfo" style="background:rgba(255,255,255,0.05); border-radius:10px; padding:15px; margin-bottom:15px; text-align:left; font-size:14px; line-height:2;">
+            </div>
+            <img id="collateralModalImage" src="" alt="Collateral" style="max-width:100%; max-height:350px; object-fit:contain; border-radius:10px; margin-bottom:15px; background:#0f172a; padding:10px;">
             <p id="collateralModalDetails" style="color:#94a3b8; font-size:14px; margin-bottom:20px;"></p>
             <div style="display:flex; gap:10px; justify-content:center;" id="collateralActionBtns">
                 <button id="approveBtn" class="btn-primary" style="background:#10b981; border:none; cursor:pointer;">Approve</button>

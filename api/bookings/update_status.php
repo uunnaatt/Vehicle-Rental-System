@@ -1,8 +1,14 @@
 <?php
 // api/bookings/update_status.php
-header("Access-Control-Allow-Origin: *");
+session_start();
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Unauthorized. Admin access required."]);
+    exit;
+}
 
 include_once '../../config/database.php';
 

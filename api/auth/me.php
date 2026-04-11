@@ -1,6 +1,6 @@
 <?php
 session_start();
-header("Access-Control-Allow-Origin: *");
+session_write_close(); // Release session lock immediately — this is read-only
 header("Content-Type: application/json; charset=UTF-8");
 
 if (isset($_SESSION['user_id'])) {

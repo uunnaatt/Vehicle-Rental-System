@@ -22,15 +22,21 @@ if (!$vehicle->id) {
 $imgUrl = $_POST['existing_image_url'] ?? '';
 
 if (isset($_FILES['image_upload']) && $_FILES['image_upload']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = '../../assets/images/';
+    // Use absolute path from current file location — never fails regardless of working dir
+    $uploadDir = dirname(__DIR__, 2) . '/assets/images/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        mkdir($uploadDir, 0777, true);
     }
-    $fileName = time() . '_' . basename($_FILES["image_upload"]["name"]);
+    $ext = pathinfo($_FILES['image_upload']['name'], PATHINFO_EXTENSION);
+    $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9_.-]/', '_', basename($_FILES['image_upload']['name']));
     $targetFilePath = $uploadDir . $fileName;
 
-    if (move_uploaded_file($_FILES["image_upload"]["tmp_name"], $targetFilePath)) {
+    if (move_uploaded_file($_FILES['image_upload']['tmp_name'], $targetFilePath)) {
+        // Path stored relative to views/ so it works as <img src> on the frontend
         $imgUrl = '../assets/images/' . $fileName;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Image upload failed. Check folder permissions.']);
+        exit;
     }
 } elseif (!empty($_POST['image_url'])) {
     $imgUrl = $_POST['image_url'];

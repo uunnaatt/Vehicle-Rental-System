@@ -35,15 +35,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('booking-return').textContent = returnDate;
     document.getElementById('booking-location').textContent = '@' + carLocation;
 
-    // Generate random booking ID and Trx ID
-    const bookingId = Math.floor(Math.random() * 90000) + 10000;
+    // Use real booking ID from server; fallback to random
+    const realBookingId = localStorage.getItem('booking_id');
+    const bookingId = realBookingId ? '#' + realBookingId : '#' + (Math.floor(Math.random() * 90000) + 10000);
     const trxId = '#' + Math.random().toString(36).substring(2, 15);
 
     document.getElementById('booking-id').textContent = bookingId;
     document.getElementById('trx-id').textContent = trxId;
 
-    // Calculate final payment amounts (favor dynamic calculation first)
-    const amount = calcTotalPrice ? parseFloat(calcTotalPrice) : baseDailyRate;
+    // Correctly calculate price from what was stored during booking
+    const storedPrice = localStorage.getItem('totalPrice');
+    const amount = storedPrice && parseFloat(storedPrice) > 0
+        ? parseFloat(storedPrice)
+        : baseDailyRate; // fallback to daily rate if nothing stored
     const serviceFee = Math.round(amount * 0.1); // 10% service fee
     const totalAmount = amount + serviceFee;
 

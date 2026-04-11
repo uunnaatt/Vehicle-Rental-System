@@ -32,15 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const returnDate = document.getElementById('return-date');
     const priceDisplay = document.querySelector('.pay-amount');
 
-    // UI visual toggles for gender and rental duration buttons
-    const genderLabels = document.querySelectorAll('.gender-option');
-    genderLabels.forEach(label => {
-        label.addEventListener('click', () => {
-            genderLabels.forEach(l => l.classList.remove('active'));
-            label.classList.add('active');
-        });
-    });
-
+    // UI visual toggles for rental duration buttons
     const rentalBtns = document.querySelectorAll('.rental-btn');
     rentalBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -169,19 +161,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
             const totalPrice = days * dailyRate;
-            const userId = localStorage.getItem('user_id');
             const locationId = locationSelect?.value || 1;
-
-            if (!userId) {
-                if (errorMessage) {
-                    errorMessage.textContent = '⚠️ You must be logged in to book a vehicle. Redirecting...';
-                    errorMessage.style.display = 'block';
-                }
-                setTimeout(() => window.location.href = 'login.php', 2000);
-                return;
-            }
+            // Get the human-readable location name for the confirmation page
+            const locationName = locationSelect?.options[locationSelect?.selectedIndex]?.text || 'Nepal';
 
             // If logged in, attempt to create booking via API
             if (vehicleId) {
@@ -193,6 +177,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     formData.append('start_date', pickupDate.value);
                     formData.append('end_date', returnDate.value);
                     formData.append('total_price', totalPrice);
+                    formData.append('booking_name', fullNameEl.value.trim());
+                    formData.append('booking_email', emailEl.value.trim());
+                    formData.append('booking_phone', contactEl.value.trim());
                     
                     formData.append('collateral_type', colTypeEl.value);
                     if (colImageEl.files[0]) {
@@ -208,6 +195,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         body: formData
                     });
 
+                    if (bookingRes.status === 401) {
+                        // Not logged in — force redirect to login
+                        window.location.href = 'login.php';
+                        return;
+                    }
+
                     const bookingData = await bookingRes.json();
 
                     if (bookingRes.status === 409) {
@@ -217,8 +210,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         return;
                     }
+
+                    // Store the real booking ID returned from server
+                    if (bookingData.booking_id) {
+                        localStorage.setItem('booking_id', bookingData.booking_id);
+                    }
                 } catch (err) {
-                    console.warn('Booking API not connected, continuing to payment page...');
+                    console.warn('Booking API error:', err);
                 }
             }
 
@@ -231,6 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('totalPrice', totalPrice);
             localStorage.setItem('vehicleName', vehicleData?.name || 'Vehicle');
             localStorage.setItem('vehicleId', vehicleId || '');
+            localStorage.setItem('carLocation', locationName);  // ← save real location name
 
             if (errorMessage) {
                 errorMessage.textContent = '✅ Processing your booking...';

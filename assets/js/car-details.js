@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Check auth status (non-blocking — we recheck on Book Now click)
+    let isAuthenticated = false;
     try {
         const authRes = await fetch('../api/auth/me.php');
-        if (!authRes.ok) throw new Error();
-    } catch {
-        window.location.href = 'login.php';
-        return;
-    }
+        if (authRes.ok) {
+            const authData = await authRes.json();
+            isAuthenticated = authData.authenticated === true;
+        }
+    } catch {}
     const urlParams = new URLSearchParams(window.location.search);
     let vehicleId = urlParams.get('vehicle_id');
     const carSlug = urlParams.get('car');
@@ -41,10 +43,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // featureTitle.innerHTML += ` <span style="float:right; color:#22c55e;">Rs. ${data.daily_rate}/Day</span>`;
             }
 
-            // Update the book now button natively!
+            // Update the book now button — guard auth at click time
             const bookNowBtn = document.querySelector('.btn-book-now');
             if (bookNowBtn) {
                 bookNowBtn.onclick = () => {
+                    if (!isAuthenticated) {
+                        window.location.href = 'login.php';
+                        return;
+                    }
                     window.location.href = `booking.php?vehicle_id=${data.id}`;
                 };
             }

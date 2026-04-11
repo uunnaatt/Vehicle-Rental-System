@@ -16,6 +16,9 @@ class Booking {
     public $collateral_type;
     public $collateral_image;
     public $agreement_accepted;
+    public $booking_name;
+    public $booking_email;
+    public $booking_phone;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -52,7 +55,8 @@ class Booking {
                       dropoff_location_id=:dropoff_location_id, start_date=:start_date, 
                       end_date=:end_date, total_price=:total_price, status=:status, 
                       collateral_type=:collateral_type, collateral_image=:collateral_image, 
-                      agreement_accepted=:agreement_accepted";
+                      agreement_accepted=:agreement_accepted,
+                      booking_name=:booking_name, booking_email=:booking_email, booking_phone=:booking_phone";
 
         $stmt = $this->conn->prepare($query);
 
@@ -71,9 +75,12 @@ class Booking {
         
         $agreement = $this->agreement_accepted ? 1 : 0;
         $stmt->bindParam(':agreement_accepted', $agreement, PDO::PARAM_INT);
+        $stmt->bindParam(':booking_name', $this->booking_name);
+        $stmt->bindParam(':booking_email', $this->booking_email);
+        $stmt->bindParam(':booking_phone', $this->booking_phone);
 
         if($stmt->execute()) {
-            return true;
+            return $this->conn->lastInsertId(); // Return the new booking ID
         }
         return false;
     }
@@ -94,10 +101,12 @@ class Booking {
         return $stmt;
     }
 
-    // Read all bookings
+    // Read all bookings (admin)
     public function read_all() {
-        $query = "SELECT b.id, b.start_date, b.end_date, b.total_price, b.status, b.collateral_type, b.collateral_image, b.agreement_accepted,
-                         u.full_name as user_name, v.name as vehicle_name
+        $query = "SELECT b.id, b.user_id, b.start_date, b.end_date, b.total_price, b.status, b.collateral_type, b.collateral_image, b.agreement_accepted,
+                         b.booking_name, b.booking_email, b.booking_phone,
+                         u.full_name as user_name, u.phone_or_email as user_account_email,
+                         v.name as vehicle_name
                   FROM " . $this->table_name . " b
                   LEFT JOIN users u ON b.user_id = u.id
                   LEFT JOIN vehicles v ON b.vehicle_id = v.id
