@@ -22,7 +22,7 @@ include '../includes/header.php'; ?>
                     <input type="text" class="search-input" placeholder="Search your dream car..." id="search-input">
                     <button class="search-icon-btn">🔍</button>
                 </div>
-                <button class="filter-btn">⚙️</button>
+                <button class="filter-btn" onclick="window.location.href='tracking.php'" title="Track Active Rental">📍</button>
             </div>
         </div>
 

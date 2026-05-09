@@ -1,4 +1,5 @@
 /* assets/css/admin.css */
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 
 /* Base & Reset */
 * {
@@ -277,4 +278,86 @@ h2 {
 .btn-primary:hover {
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
     transform: translateY(-2px);
+}
+
+.gps-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr 330px;
+    gap: 18px;
+    min-height: 560px;
+}
+
+.gps-list-panel,
+.gps-map-panel,
+.gps-info-panel {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.gps-list-panel h3,
+.gps-info-panel h3 {
+    margin-bottom: 14px;
+    color: #f8fafc;
+}
+
+.gps-rental-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.gps-rental-item {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.gps-rental-item.active {
+    border-color: rgba(56, 189, 248, 0.8);
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.25);
+}
+
+#admin-gps-map {
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.gps-empty-state {
+    margin-top: 10px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.gps-rental-info {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.gps-rental-info .status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.gps-rental-info .status-pill.paid {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.gps-rental-info .status-pill.unpaid {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
 }

@@ -15,6 +15,7 @@ include '../includes/header.php';
             <li class="active" id="menu-overview"><a href="#" onclick="showSection('overview', this)"><i class="fa-solid fa-chart-line icon"></i> Overview</a></li>
             <li id="menu-vehicles"><a href="#" onclick="showSection('vehicles', this)"><i class="fa-solid fa-car icon"></i> Vehicles</a></li>
             <li id="menu-bookings"><a href="#" onclick="showSection('bookings', this)"><i class="fa-regular fa-calendar-check icon"></i> Bookings</a></li>
+            <li id="menu-gps"><a href="#" onclick="showSection('gps', this)"><i class="fa-solid fa-location-dot icon"></i> GPS Tracking</a></li>
             <li id="menu-reviews"><a href="#" onclick="showSection('reviews', this)"><i class="fa-solid fa-star icon"></i> Reviews</a></li>
             <li id="menu-inbox"><a href="#" onclick="showSection('inbox', this)"><i class="fa-regular fa-comments icon"></i> Support Inbox</a></li>
             <li><a href="index.php"><i class="fa-solid fa-house icon"></i> Go to Site</a></li>
@@ -87,11 +88,11 @@ include '../includes/header.php';
                 </div>
                 <!-- Category filter -->
                 <div style="display:flex; gap:10px; margin-bottom:25px; flex-wrap:wrap;">
-                    <button class="filter-chip active-chip" onclick="filterVehicles('')">All</button>
-                    <button class="filter-chip" onclick="filterVehicles('SUV')">SUV</button>
-                    <button class="filter-chip" onclick="filterVehicles('Sedan')">Sedan</button>
-                    <button class="filter-chip" onclick="filterVehicles('Hatchback')">Hatchback</button>
-                    <button class="filter-chip" onclick="filterVehicles('Pickup')">Pickup</button>
+                    <button class="filter-chip active-chip" onclick="filterVehicles('', this)">All</button>
+                    <button class="filter-chip" onclick="filterVehicles('SUV', this)">SUV</button>
+                    <button class="filter-chip" onclick="filterVehicles('Sedan', this)">Sedan</button>
+                    <button class="filter-chip" onclick="filterVehicles('Hatchback', this)">Hatchback</button>
+                    <button class="filter-chip" onclick="filterVehicles('Pickup', this)">Pickup</button>
                 </div>
                 <div class="table-responsive">
                     <table class="admin-table">
@@ -117,6 +118,25 @@ include '../includes/header.php';
                             <tr><td colspan="8" class="text-center">Loading...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- ===== GPS TRACKING ===== -->
+            <div id="section-gps" class="admin-section" style="display:none;">
+                <h1 class="section-title">Live GPS Tracking</h1>
+                <div class="gps-layout">
+                    <div class="gps-list-panel">
+                        <h3>Active Rentals</h3>
+                        <div id="gps-rental-list" class="gps-rental-list">Loading active rentals...</div>
+                    </div>
+                    <div class="gps-map-panel">
+                        <div id="admin-gps-map"></div>
+                        <div id="gps-empty-state" class="gps-empty-state" style="display:none;">No active rentals to track right now.</div>
+                    </div>
+                    <div class="gps-info-panel">
+                        <h3>Selected Rental</h3>
+                        <div id="gps-rental-info" class="gps-rental-info">Select a rental from the list to start tracking.</div>
+                    </div>
                 </div>
             </div>
 
@@ -264,6 +284,7 @@ include '../includes/header.php';
 
 </main>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="../assets/js/admin.js"></script>
 </body>
 </html>

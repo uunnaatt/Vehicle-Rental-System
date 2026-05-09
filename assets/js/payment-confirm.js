@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const returnDate = localStorage.getItem('returnDate') || '22 Jan 2026 at 05:00 PM';
     const customerName = localStorage.getItem('customerName') || 'Binayak Ghising';
     const carLocation = localStorage.getItem('carLocation') || 'Dharan, Sunsari';
-    const calcTotalPrice = localStorage.getItem('totalPrice'); // Get dynamic price!
+    const storedVehicleName = localStorage.getItem('vehicleName');
 
     // Fallback logic
     if (!vehicleId && carSlug) {
@@ -27,8 +27,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('confirm-car-name').textContent = data.name.toUpperCase();
             document.getElementById('confirm-car-image').src = data.image_url;
             baseDailyRate = parseFloat(data.daily_rate);
+            localStorage.setItem('vehicleName', data.name);
         }
     } catch(e) { console.error('API Error:', e); }
+
+    if (storedVehicleName && document.getElementById('confirm-car-name')?.textContent === 'Tesla Model S') {
+        document.getElementById('confirm-car-name').textContent = storedVehicleName.toUpperCase();
+    }
 
     document.getElementById('booking-name').textContent = customerName;
     document.getElementById('booking-pickup').textContent = pickupDate;
@@ -121,7 +126,7 @@ if (confirmPaymentBtn) {
 
         // Redirect to success page
         alert('✅ Payment Confirmed! Redirecting...');
-        window.location.href = 'payment-success.php?car=' + carSlug;
+        window.location.href = `payment-success.php?vehicle_id=${vehicleId}`;
     });
 }
 });
