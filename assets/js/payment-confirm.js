@@ -98,19 +98,19 @@ if (confirmPaymentBtn) {
         const cardCvv = document.getElementById('card-cvv').value;
 
         if (!cardName || !cardEmail || !cardNumber || !cardExpiry || !cardCvv) {
-            alert('⚠️ Please fill in all card information!');
+            alert('Please fill in all card information.');
             return;
         }
 
         // Validate card number length (16 digits + 3 spaces = 19)
         if (cardNumber.replace(/\s/g, '').length !== 16) {
-            alert('⚠️ Please enter a valid 16-digit card number!');
+            alert('Please enter a valid 16-digit card number.');
             return;
         }
 
         // Validate CVV length
         if (cardCvv.length !== 3) {
-            alert('⚠️ Please enter a valid 3-digit CVV!');
+            alert('Please enter a valid 3-digit CVV.');
             return;
         }
 
@@ -120,7 +120,7 @@ if (confirmPaymentBtn) {
         localStorage.setItem('totalAmount', totalAmount);
 
         // Redirect to success page
-        alert('✅ Payment Confirmed! Redirecting...');
+        alert('Payment confirmed. Redirecting...');
         window.location.href = 'payment-success.php?car=' + carSlug;
     });
 }

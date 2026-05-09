@@ -19,6 +19,7 @@ include '../includes/header.php';
         <!-- Tabs -->
         <div style="display:flex; gap:10px; margin-bottom:30px; flex-wrap:wrap;">
             <button class="tab-btn active" onclick="switchTab('bookings', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.3); color:#000; font-weight:600; cursor:pointer;"><i class="fa-regular fa-calendar-check"></i> My Bookings</button>
+            <button class="tab-btn" onclick="switchTab('favorites', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.15); color:#000; font-weight:600; cursor:pointer;"><i class="fa-solid fa-heart"></i> Favorites</button>
             <button class="tab-btn" onclick="switchTab('reviews', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.15); color:#000; font-weight:600; cursor:pointer;"><i class="fa-solid fa-star"></i> My Reviews</button>
             <button class="tab-btn" onclick="switchTab('support', this)" style="padding:10px 22px; border-radius:20px; border:none; background:rgba(255,255,255,0.15); color:#000; font-weight:600; cursor:pointer;"><i class="fa-regular fa-comments"></i> Contact Support</button>
         </div>
@@ -27,6 +28,12 @@ include '../includes/header.php';
         <div id="tab-bookings" class="profile-tab">
             <div id="bookings-list" style="display:flex; flex-direction:column; gap:20px;">
                 <p>Loading bookings...</p>
+            </div>
+        </div>
+
+        <div id="tab-favorites" class="profile-tab" style="display:none;">
+            <div id="favorites-list" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px;">
+                <p>Loading favorites...</p>
             </div>
         </div>
 
@@ -64,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('profile-avatar').textContent = (data.full_name || 'U').charAt(0).toUpperCase();
 
         loadBookings();
+        loadFavorites();
         loadReviews();
     } catch {
         window.location.href = 'login.php';
@@ -88,6 +96,40 @@ function switchTab(tab, btn) {
     } else {
         if(chatPollInterval) clearInterval(chatPollInterval);
         chatPollInterval = null;
+    }
+}
+
+async function loadFavorites() {
+    const container = document.getElementById('favorites-list');
+    try {
+        const res = await fetch('../api/favorites/list.php');
+        if(!res.ok) throw new Error('none');
+        const data = await res.json();
+        if(!data.records?.length) { container.innerHTML = '<p style="opacity:0.7">No favorites yet. <a href="dashboard.php" style="font-weight:700">Browse vehicles</a></p>'; return; }
+        container.innerHTML = data.records.map(v => `
+            <article class="car-card" onclick="window.location.href='car-details.php?vehicle_id=${v.id}'" style="cursor:pointer;">
+                <div class="car-card-image">
+                    <img src="${v.image_url}" alt="${v.name}" onerror="this.src='../assets/images/car1.png'">
+                </div>
+                <div class="car-card-details">
+                    <h3 class="car-name">${v.name}</h3>
+                    <div class="car-meta-row">
+                        <span class="car-category">${v.category_name || ''}</span>
+                        <span>${v.transmission || ''}</span>
+                    </div>
+                    <div class="car-location">
+                        <span class="location-icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <span>${v.location_name || 'SAWARI hub'}</span>
+                    </div>
+                    <div class="car-footer">
+                        <span class="car-price">Rs. ${Number(v.daily_rate).toLocaleString()}<small>/Day</small></span>
+                        <button class="book-now-btn" onclick="event.stopPropagation(); window.location.href='booking.php?vehicle_id=${v.id}'">Book now</button>
+                    </div>
+                </div>
+            </article>
+        `).join('');
+    } catch(e) {
+        container.innerHTML = '<p style="opacity:0.7;">No favorites yet.</p>';
     }
 }
 
@@ -116,7 +158,7 @@ async function loadBookings() {
 async function loadReviews() {
     const container = document.getElementById('reviews-list');
     try {
-        const res = await fetch('../api/reviews/read.php');
+        const res = await fetch('../api/reviews/read.php?mine=1');
         if(!res.ok) throw new Error('none');
         const data = await res.json();
         if(!data.records?.length) { container.innerHTML = '<p style="opacity:0.7">No reviews yet.</p>'; return; }

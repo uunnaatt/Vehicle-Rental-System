@@ -18,15 +18,15 @@
             
             <ul class="contact-details">
                 <li>
-                    <span class="icon">📍</span>
+                    <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
                     <span>Location: Kathmandu, Nepal</span>
                 </li>
                 <li>
-                    <span class="icon">📞</span>
+                    <span class="icon"><i class="fa-solid fa-phone"></i></span>
                     <span>Phone: +977-XXXXXXXXXX</span>
                 </li>
                 <li>
-                    <span class="icon">✉️</span>
+                    <span class="icon"><i class="fa-solid fa-envelope"></i></span>
                     <span>Email: support@sawari.com</span>
                 </li>
             </ul>

@@ -6,8 +6,10 @@ if (empty($_SESSION['csrf_token'])) {
 include '../includes/header.php'; 
 ?>
 
+<style>.navbar { display: none; }</style>
+
 <main class="auth-section">
-    <div class="auth-container">
+    <div class="auth-container auth-container-login">
         <!-- Top Logo -->
         <div class="auth-logo">
             <img src="../assets/images/LOGO.png" alt="SAWARI" class="auth-logo-img">
@@ -15,7 +17,8 @@ include '../includes/header.php';
 
         <!-- Login Form -->
         <div class="auth-form">
-            <h1 class="auth-title">WELCOME BACK<br>READY TO HIT THE ROAD?</h1>
+            <h1 class="auth-title">WELCOME BACK</h1>
+            <p class="auth-subtitle">Ready to hit the road?</p>
             
             <form class="form" id="login-form">
                 <input type="text" id="log-phone-email" class="form-input" placeholder="Enter Phone/Email" required>
@@ -25,13 +28,13 @@ include '../includes/header.php';
                     <label class="checkbox-label">
                         <input type="checkbox" name="remember"> Remember Me
                     </label>
-                    <a href="#" class="forgot-link">Forgot Password</a>
+                    <a href="forgot-password.php" class="forgot-link">Forgot Password</a>
                 </div>
 
                 <button type="submit" class="btn-auth">LOGIN</button>
                 <button type="button" class="btn-auth btn-secondary" onclick="window.location.href='register.php'">SIGNUP</button>
             </form>
-            <div id="log-message" style="color: red; margin-top: 10px; display: none; text-align: center;"></div>
+            <div id="log-message" class="auth-message"></div>
 
             <!-- Divider -->
             <div class="divider">
@@ -41,7 +44,7 @@ include '../includes/header.php';
             </div>
 
             <!-- Google Login -->
-            <button class="btn-google">
+            <button class="btn-google" onclick="window.location.href='../api/auth/google_start.php'">
                 <img src="../assets/images/google-icon.png" alt="Google" class="google-icon">
                 Continue with Google
             </button>
@@ -54,11 +57,18 @@ include '../includes/header.php';
 
 <script>
 const csrfToken = "<?php echo $_SESSION['csrf_token']; ?>";
+const authParams = new URLSearchParams(window.location.search);
+const authError = authParams.get('auth_error');
+if (authError) {
+    const messageDiv = document.getElementById('log-message');
+    messageDiv.className = 'auth-message error';
+    messageDiv.textContent = authError;
+}
 
 // Dynamic Phone/Email input length check
 document.getElementById('log-phone-email')?.addEventListener('input', function() {
     if (/^\d+$/.test(this.value) && this.value.length > 10) {
-        this.value = this.value.substring(0, 10);
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
     }
 });
 
@@ -96,12 +106,12 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             }
         } else {
             // Error
-            messageDiv.style.display = 'block';
+            messageDiv.className = 'auth-message error';
             messageDiv.innerText = res.body.message || 'Login failed.';
         }
     })
     .catch(error => {
-        messageDiv.style.display = 'block';
+        messageDiv.className = 'auth-message error';
         messageDiv.innerText = 'An error occurred. Please try again.';
     });
 });

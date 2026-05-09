@@ -19,12 +19,19 @@ if (!isset($_SESSION['user_id'])) {
 $data = json_decode(file_get_contents("php://input"));
 
 if(!empty($data->vehicle_id) && !empty($data->rating)) {
+    $rating = (int)$data->rating;
+    if ($rating < 1 || $rating > 5) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Rating must be between 1 and 5."));
+        exit;
+    }
+
     $query = "INSERT INTO reviews (user_id, vehicle_id, rating, comment) 
               VALUES (:user_id, :vehicle_id, :rating, :comment)";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':user_id', $_SESSION['user_id']);
     $stmt->bindParam(':vehicle_id', $data->vehicle_id);
-    $stmt->bindParam(':rating', $data->rating);
+    $stmt->bindParam(':rating', $rating);
     $comment = !empty($data->comment) ? htmlspecialchars(strip_tags($data->comment)) : '';
     $stmt->bindParam(':comment', $comment);
 

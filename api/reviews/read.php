@@ -10,8 +10,24 @@ $database = new Database();
 $db = $database->getConnection();
 
 $vehicle_id = isset($_GET['vehicle_id']) ? (int)$_GET['vehicle_id'] : 0;
+$mine = isset($_GET['mine']) && $_GET['mine'] === '1';
 
-if($vehicle_id) {
+if ($mine) {
+    session_start();
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(["message" => "Unauthorized"]);
+        exit;
+    }
+    $query = "SELECT r.id, r.rating, r.comment, r.created_at, u.full_name as reviewer_name, v.name as vehicle_name
+              FROM reviews r
+              LEFT JOIN users u ON r.user_id = u.id
+              LEFT JOIN vehicles v ON r.vehicle_id = v.id
+              WHERE r.user_id = :user_id
+              ORDER BY r.created_at DESC";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+} elseif($vehicle_id) {
     $query = "SELECT r.id, r.rating, r.comment, r.created_at, u.full_name as reviewer_name
               FROM reviews r
               LEFT JOIN users u ON r.user_id = u.id

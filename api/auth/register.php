@@ -11,6 +11,12 @@ $user = new User($db);
 $data = json_decode(file_get_contents("php://input"));
 
 if(!empty($data->full_name) && !empty($data->phone_or_email) && !empty($data->password)) {
+    if (preg_match('/^\d+$/', $data->phone_or_email) && !preg_match('/^\d{10}$/', $data->phone_or_email)) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Phone number must be exactly 10 digits."));
+        exit;
+    }
+
     $user->full_name = $data->full_name;
     $user->phone_or_email = $data->phone_or_email;
     $user->password = $data->password;

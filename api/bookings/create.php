@@ -23,6 +23,12 @@ if(!isset($_SESSION['user_id'])) {
 }
 
 if(!empty($_POST['vehicle_id']) && !empty($_POST['start_date']) && !empty($_POST['end_date'])) {
+    $bookingPhone = preg_replace('/\D/', '', $_POST['booking_phone'] ?? '');
+    if (!preg_match('/^\d{10}$/', $bookingPhone)) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Please provide a valid 10-digit contact number."));
+        exit;
+    }
     
     // Validate agreement
     if (!isset($_POST['agreement_accepted']) || $_POST['agreement_accepted'] !== 'true') {
@@ -68,7 +74,7 @@ if(!empty($_POST['vehicle_id']) && !empty($_POST['start_date']) && !empty($_POST
     $booking->agreement_accepted = true;
     $booking->booking_name  = $_POST['booking_name']  ?? '';
     $booking->booking_email = $_POST['booking_email'] ?? '';
-    $booking->booking_phone = $_POST['booking_phone'] ?? '';
+    $booking->booking_phone = $bookingPhone;
 
     $newId = $booking->create();
     if($newId) {

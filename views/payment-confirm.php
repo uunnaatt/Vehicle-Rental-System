@@ -15,7 +15,7 @@ include '../includes/header.php'; ?>
                 <h1 class="car-name" id="confirm-car-name">Tesla Model S</h1>
                 <p class="car-description">A car with high specs that are rented at an affordable price.</p>
                 <div class="car-rating-display">
-                    <span class="rating">5.0 ★</span>
+                    <span class="rating">5.0 <i class="fa-solid fa-star"></i></span>
                     <span class="review-count">(100+ Reviews)</span>
                 </div>
             </div>

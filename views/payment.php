@@ -3,7 +3,7 @@
 <main class="payment-page">
     <div class="payment-container">
         <div class="payment-content">
-            <div class="success-icon">✅</div>
+            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
             <h1 class="payment-title">Payment Successful!</h1>
             <p class="payment-message">Your booking has been confirmed.</p>
             
@@ -28,8 +28,8 @@
             </div>
 
             <div class="payment-actions">
-                <button class="btn-download" onclick="alert('Booking confirmation downloaded!')">📥 Download Receipt</button>
-                <button class="btn-home" onclick="window.location.href='index.php'">🏠 Go to Home</button>
+                <button class="btn-download" onclick="alert('Booking confirmation downloaded!')"><i class="fa-solid fa-download"></i> Download Receipt</button>
+                <button class="btn-home" onclick="window.location.href='index.php'"><i class="fa-solid fa-house"></i> Go to Home</button>
             </div>
         </div>
     </div>

@@ -18,6 +18,8 @@ if($vehicle->read_single()) {
         "name" => $vehicle->name,
         "brand" => $vehicle->brand,
         "model_year" => $vehicle->model_year,
+        "category_id" => $vehicle->category_id,
+        "location_id" => $vehicle->location_id,
         "category_name" => $vehicle->category_name,
         "location_name" => $vehicle->location_name,
         "seats" => $vehicle->seats,
@@ -25,7 +27,8 @@ if($vehicle->read_single()) {
         "fuel_type" => $vehicle->fuel_type,
         "daily_rate" => $vehicle->daily_rate,
         "image_url" => $vehicle->image_url,
-        "status" => $vehicle->status
+        "status" => $vehicle->status,
+        "description" => $vehicle->description
     );
 
     http_response_code(200);
