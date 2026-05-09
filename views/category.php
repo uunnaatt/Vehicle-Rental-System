@@ -12,7 +12,7 @@
             <!-- Search Bar -->
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Search your dream car...">
-                <button class="search-btn">🔍</button>
+                <button class="search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </div>
 

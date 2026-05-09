@@ -4,6 +4,7 @@ include '../includes/header.php';
 ?>
 
 <link rel="stylesheet" href="../assets/css/admin.css">
+<style>.navbar { display: none; }</style>
 
 <main class="admin-dashboard">
     <!-- Sidebar -->
@@ -25,7 +26,7 @@ include '../includes/header.php';
     <!-- Main Content -->
     <section class="admin-main">
         <header class="admin-topbar">
-            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar"><i class="fa-solid fa-bars"></i></button>
             <h2 style="font-size:18px; color:#e2e8f0; font-weight:600;" id="section-heading">Overview</h2>
             <div class="user-info">
                 <span id="admin-name" style="color:#94a3b8; font-size:14px;">Admin</span>
@@ -53,13 +54,13 @@ include '../includes/header.php';
                 </div>
 
                 <!-- Quick charts placeholder -->
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:40px;">
+                <div class="admin-charts-grid">
                     <div style="background:rgba(30,41,59,0.5); border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,0.05);">
                         <h3 style="margin-bottom:20px; color:#f8fafc;"><i class="fa-solid fa-list"></i> Category Breakdown</h3>
                         <div id="category-breakdown">Loading...</div>
                     </div>
                     <div style="background:rgba(30,41,59,0.5); border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,0.05);">
-                        <h3 style="margin-bottom:20px; color:#f8fafc;">⭐ Latest Reviews</h3>
+                        <h3 style="margin-bottom:20px; color:#f8fafc;"><i class="fa-solid fa-star"></i> Latest Reviews</h3>
                         <div id="admin-reviews-preview">Loading...</div>
                     </div>
                 </div>
@@ -207,9 +208,9 @@ include '../includes/header.php';
                     <div>
                         <label>Status</label>
                         <select id="v_status" name="status" style="width:100%; padding:8px; border-radius:5px; border:1px solid #334155; background:#0f172a; color:#fff;">
-                            <option value="Available">Available</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Rented">Rented</option>
+                            <option value="available">Available</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="booked">Booked</option>
                         </select>
                     </div>
                 </div>

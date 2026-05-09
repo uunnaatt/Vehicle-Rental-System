@@ -19,7 +19,7 @@ include '../includes/header.php';
                 <input type="email" class="form-input" placeholder="Email Address*" id="email" required>
             </div>
             <div class="form-group">
-                <input type="tel" class="form-input" placeholder="Contact*" id="contact" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                <input type="tel" class="form-input" placeholder="Contact*" id="contact" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
             </div>
 
             <!-- Rental Date & Time -->
@@ -36,7 +36,7 @@ include '../includes/header.php';
             <!-- Car Location -->
             <div class="form-group">
                 <label class="form-label">Car Location</label>
-                <input type="text" class="form-input" placeholder="📍 Dharan, Sunsari" id="location">
+                <input type="text" class="form-input" placeholder="Select pickup location" id="location">
             </div>
 
             <!-- Pick Up & Return Date -->
@@ -54,28 +54,34 @@ include '../includes/header.php';
             </div>
 
             <!-- Collateral Upload -->
-            <div class="form-group" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <div class="form-group collateral-section">
                 <label class="form-label">Requirement / Collateral</label>
-                <select id="collateral-type" class="form-input" style="margin-bottom: 10px; background: #1e293b; color: #fff;" required>
+                <select id="collateral-type" class="form-input" required>
                     <option value="" disabled selected>Select ID Type*</option>
                     <option value="Citizenship Card">Citizenship Card</option>
                     <option value="Passport">Passport</option>
                     <option value="Driving License">Driving License</option>
                 </select>
-                <label class="form-label" style="font-size: 12px; opacity: 0.8; margin-top: 10px;">Upload ID Photo*</label>
-                <input type="file" id="collateral-image" class="form-input" accept="image/*" required style="padding-top: 8px;">
+                <label class="form-label compact-label">Upload ID Photo*</label>
+                <input type="file" id="collateral-image" class="form-input file-input" accept="image/*" required>
             </div>
 
             <!-- User Agreement -->
-            <div class="form-group" style="background: rgba(30,41,59,0.5); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <label class="form-label">Rental User Agreement</label>
-                <div style="height: 80px; overflow-y: auto; font-size: 12px; color: #94a3b8; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
-                    1. The Renter agrees to return the vehicle in the same condition as received.<br>
-                    2. The uploaded collateral serves as security and must be authentic.<br>
-                    3. Any damages or traffic violations are the sole responsibility of the Renter.<br>
-                    4. The platform reserves the right to reject any application based on collateral review.
+            <div class="form-group rental-agreement">
+                <div class="agreement-heading">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <div>
+                        <label class="form-label">Rental User Agreement</label>
+                        <p>Review these terms before submitting the rental request.</p>
+                    </div>
                 </div>
-                <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+                <div class="agreement-list">
+                    <div><span>1</span><p>The renter must return the vehicle on time and in the same condition as received.</p></div>
+                    <div><span>2</span><p>The uploaded ID is held only for verification and collateral review.</p></div>
+                    <div><span>3</span><p>Traffic fines, misuse, late return, or damage charges remain the renter's responsibility.</p></div>
+                    <div><span>4</span><p>SAWARI may reject a booking if details or collateral cannot be verified.</p></div>
+                </div>
+                <label class="agreement-check">
                     <input type="checkbox" id="agreement-checkbox" required>
                     <span>I have read and agree to the User Agreement.*</span>
                 </label>
@@ -83,7 +89,7 @@ include '../includes/header.php';
 
             <!-- Error Message -->
             <div class="error-message" id="error-message" style="display: none;">
-                ⚠️ PLEASE FILL UP THE INFORMATION!!!
+                Please fill up the required information.
             </div>
 
             <!-- Back Button -->

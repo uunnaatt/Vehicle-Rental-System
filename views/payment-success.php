@@ -9,7 +9,7 @@ include '../includes/header.php'; ?>
 
 <main class="payment-success-page">
     <div class="payment-success-container">
-        <div class="success-icon">✅</div>
+        <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
         <h1 class="payment-success-title">Payment Successful!</h1>
         <p class="payment-success-message">Your booking has been confirmed.</p>
         
@@ -34,8 +34,8 @@ include '../includes/header.php'; ?>
         </div>
 
         <div class="payment-success-actions">
-            <button class="btn-download" onclick="alert('📥 Booking confirmation downloaded!')">Download Receipt</button>
-            <button class="btn-home" onclick="window.location.href='index.php'">🏠 Go to Home</button>
+            <button class="btn-download" onclick="alert('Booking confirmation downloaded!')"><i class="fa-solid fa-download"></i> Download Receipt</button>
+            <button class="btn-home" onclick="window.location.href='index.php'"><i class="fa-solid fa-house"></i> Go to Home</button>
         </div>
     </div>
 </main>

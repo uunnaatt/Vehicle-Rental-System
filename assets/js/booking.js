@@ -31,6 +31,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pickupDate = document.getElementById('pickup-date');
     const returnDate = document.getElementById('return-date');
     const priceDisplay = document.querySelector('.pay-amount');
+    const contactInput = document.getElementById('contact');
+
+    if (contactInput) {
+        contactInput.addEventListener('input', () => {
+            contactInput.value = contactInput.value.replace(/\D/g, '').slice(0, 10);
+        });
+    }
 
     // UI visual toggles for rental duration buttons
     const rentalBtns = document.querySelectorAll('.rental-btn');
@@ -133,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const errors = [];
             if (!fullNameEl?.value.trim()) errors.push('Full Name');
             if (!emailEl?.value.trim()) errors.push('Email');
-            if (!contactEl?.value.trim()) errors.push('Contact');
+            if (!/^\d{10}$/.test(contactEl?.value.trim() || '')) errors.push('10-digit Contact');
             if (!pickupDate?.value) errors.push('Pickup Date');
             if (!returnDate?.value) errors.push('Return Date');
             if (!colTypeEl?.value) errors.push('Collateral Type');
@@ -142,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (errors.length > 0) {
                 if (errorMessage) {
-                    errorMessage.textContent = `⚠️ Please fill: ${errors.join(', ')}`;
+                    errorMessage.textContent = `Please fill: ${errors.join(', ')}`;
                     errorMessage.style.display = 'block';
                     setTimeout(() => errorMessage.style.display = 'none', 3500);
                 }
@@ -154,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const end = new Date(returnDate.value);
             if (end <= start) {
                 if (errorMessage) {
-                    errorMessage.textContent = '⚠️ Return date must be after pickup date.';
+                    errorMessage.textContent = 'Return date must be after pickup date.';
                     errorMessage.style.display = 'block';
                     setTimeout(() => errorMessage.style.display = 'none', 3000);
                 }
@@ -205,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (bookingRes.status === 409) {
                         if (errorMessage) {
-                            errorMessage.textContent = '⚠️ Vehicle is already booked for those dates!';
+                            errorMessage.textContent = 'Vehicle is already booked for those dates.';
                             errorMessage.style.display = 'block';
                         }
                         return;
@@ -232,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('carLocation', locationName);  // ← save real location name
 
             if (errorMessage) {
-                errorMessage.textContent = '✅ Processing your booking...';
+                errorMessage.textContent = 'Processing your booking...';
                 errorMessage.style.background = 'rgba(34, 197, 94, 0.2)';
                 errorMessage.style.color = '#16a34a';
                 errorMessage.style.display = 'block';
