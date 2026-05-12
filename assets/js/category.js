@@ -8,10 +8,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const categoryParam = urlParams.get('type') || '';
 
 // Update category title
+const categoryTitleEl = document.getElementById('category-name');
 if (categoryParam) {
-    document.getElementById('category-name').textContent = "Vehicles in " + categoryParam;
+    if (categoryTitleEl) categoryTitleEl.textContent = "Vehicles in " + categoryParam;
 } else {
-    document.getElementById('category-name').textContent = "All Vehicles";
+    if (categoryTitleEl) categoryTitleEl.textContent = "All Vehicles";
 }
 
 let allVehicles = [];
@@ -124,8 +125,8 @@ if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filtered = allVehicles.filter(car => 
-            car.name.toLowerCase().includes(searchTerm) || 
-            car.brand.toLowerCase().includes(searchTerm)
+            (car.name || '').toLowerCase().includes(searchTerm) || 
+            (car.brand || '').toLowerCase().includes(searchTerm)
         );
         renderCars(filtered);
     });

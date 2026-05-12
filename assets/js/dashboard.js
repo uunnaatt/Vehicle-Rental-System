@@ -202,6 +202,7 @@ async function requestAiRecommendations(event) {
 
 function scrollCars(section, direction) {
     const carousel = document.getElementById(`${section}-cars`);
+    if (!carousel) return;
     carousel.scrollBy({ left: direction * 320, behavior: 'smooth' });
 }
 
@@ -276,7 +277,7 @@ if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allVehicles.filter(c =>
-            c.name.toLowerCase().includes(term) || c.brand.toLowerCase().includes(term)
+            (c.name || '').toLowerCase().includes(term) || (c.brand || '').toLowerCase().includes(term)
         );
         renderSection('nearby-cars', filtered.slice(0, 6));
         renderSection('popular-cars', filtered.slice(0, 6));

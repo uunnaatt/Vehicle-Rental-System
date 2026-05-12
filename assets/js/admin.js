@@ -20,6 +20,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadReviewsPreview();
 });
 
+let gpsMap = null;
+let gpsMarker = null;
+let gpsRecords = [];
+let selectedGpsBookingId = null;
+
 function showSection(sectionId, el) {
     document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
@@ -28,11 +33,12 @@ function showSection(sectionId, el) {
     if (section) section.style.display = 'block';
     
     document.getElementById('section-heading').textContent =
-        { overview: 'Overview', vehicles: 'Manage Vehicles', bookings: 'All Bookings', reviews: 'Customer Reviews', inbox: 'Support Inbox' }[sectionId] || sectionId;
+        { overview: 'Overview', vehicles: 'Manage Vehicles', bookings: 'All Bookings', gps: 'GPS Tracking', reviews: 'Customer Reviews', inbox: 'Support Inbox' }[sectionId] || sectionId;
     if (el) el.closest('li').classList.add('active');
 
     if (sectionId === 'vehicles') fetchAdminVehicles();
     if (sectionId === 'bookings') fetchAllBookings();
+    if (sectionId === 'gps') initGpsTracking();
     if (sectionId === 'reviews') fetchAllReviews();
     if (sectionId === 'inbox') fetchInboxList();
     
@@ -41,6 +47,120 @@ function showSection(sectionId, el) {
         if(window.adminChatPoll) clearInterval(window.adminChatPoll);
         window.adminChatPoll = null;
     }
+
+    if (sectionId !== 'gps') {
+        if (window.adminGpsPoll) clearInterval(window.adminGpsPoll);
+        window.adminGpsPoll = null;
+    }
+}
+
+function initGpsTracking() {
+    if (!gpsMap && window.L) {
+        gpsMap = L.map('admin-gps-map').setView([27.700769, 85.300140], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(gpsMap);
+    }
+
+    fetchGpsTrackingData();
+    if (window.adminGpsPoll) clearInterval(window.adminGpsPoll);
+    window.adminGpsPoll = setInterval(fetchGpsTrackingData, 15000);
+}
+
+async function fetchGpsTrackingData() {
+    const listEl = document.getElementById('gps-rental-list');
+    const emptyEl = document.getElementById('gps-empty-state');
+
+    if (!listEl) return;
+
+    try {
+        const res = await fetch('../api/tracking/admin_active.php');
+        const data = await res.json();
+        gpsRecords = data.records || [];
+
+        if (!gpsRecords.length) {
+            listEl.innerHTML = 'No active rentals found.';
+            if (emptyEl) emptyEl.style.display = 'block';
+            if (gpsMarker && gpsMap) gpsMap.removeLayer(gpsMarker);
+            document.getElementById('gps-rental-info').textContent = 'No active rentals to track right now.';
+            return;
+        }
+
+        if (emptyEl) emptyEl.style.display = 'none';
+        renderGpsRentalList();
+
+        if (!selectedGpsBookingId || !gpsRecords.find(r => r.booking_id === selectedGpsBookingId)) {
+            selectedGpsBookingId = gpsRecords[0].booking_id;
+        }
+
+        const activeRecord = gpsRecords.find(r => r.booking_id === selectedGpsBookingId) || gpsRecords[0];
+        renderGpsDetails(activeRecord);
+        updateGpsMap(activeRecord);
+    } catch (e) {
+        listEl.innerHTML = 'Failed to load tracking data.';
+    }
+}
+
+function renderGpsRentalList() {
+    const listEl = document.getElementById('gps-rental-list');
+    if (!listEl) return;
+
+    listEl.innerHTML = gpsRecords.map(record => `
+        <button class="gps-rental-item ${record.booking_id === selectedGpsBookingId ? 'active' : ''}" onclick="selectGpsBooking(${record.booking_id})">
+            <div><strong>${record.vehicle_name}</strong></div>
+            <div style="font-size:12px; opacity:0.8;">Booking #${record.booking_id}</div>
+            <div style="font-size:12px; opacity:0.8;">${record.renter_name || 'Unknown renter'}</div>
+        </button>
+    `).join('');
+}
+
+function selectGpsBooking(bookingId) {
+    selectedGpsBookingId = bookingId;
+    renderGpsRentalList();
+    const activeRecord = gpsRecords.find(r => r.booking_id === bookingId);
+    if (!activeRecord) return;
+    renderGpsDetails(activeRecord);
+    updateGpsMap(activeRecord);
+}
+
+function renderGpsDetails(record) {
+    const infoEl = document.getElementById('gps-rental-info');
+    if (!infoEl || !record) return;
+
+    infoEl.innerHTML = `
+        <div><strong>Vehicle:</strong> ${record.vehicle_name}</div>
+        <div><strong>Renter:</strong> ${record.renter_name || 'N/A'}</div>
+        <div><strong>Contact:</strong> ${record.renter_contact || 'N/A'}</div>
+        <div><strong>Booked Date:</strong> ${record.booked_date}</div>
+        <div><strong>Return Date:</strong> ${record.return_date}</div>
+        <div><strong>Payment:</strong> <span class="status-pill ${record.payment_status}">${record.payment_status}</span></div>
+        <div><strong>Booking Status:</strong> ${record.booking_status}</div>
+        <div><strong>Location:</strong> ${record.location_label}</div>
+        <div><strong>Last Update:</strong> ${record.last_updated}</div>
+    `;
+}
+
+function updateGpsMap(record) {
+    if (!gpsMap || !record) return;
+
+    const lat = Number(record.lat);
+    const lng = Number(record.lng);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    if (gpsMarker) gpsMap.removeLayer(gpsMarker);
+    gpsMarker = L.marker([lat, lng]).addTo(gpsMap);
+
+    const popupContent = document.createElement('div');
+    const vehicleNameEl = document.createElement('strong');
+    vehicleNameEl.textContent = record.vehicle_name || '';
+    popupContent.appendChild(vehicleNameEl);
+    popupContent.appendChild(document.createElement('br'));
+    popupContent.appendChild(document.createTextNode(`Booking #${record.booking_id}`));
+
+    gpsMarker.bindPopup(popupContent).openPopup();
+    gpsMap.setView([lat, lng], 13);
 }
 
 async function fetchAdminStats() {
@@ -144,9 +264,9 @@ async function updateVehicleStatus(id, selectElement) {
     }
 }
 
-function filterVehicles(category) {
+function filterVehicles(category, triggerEl) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active-chip'));
-    event.target.classList.add('active-chip');
+    if (triggerEl) triggerEl.classList.add('active-chip');
     const filtered = category ? allAdminVehicles.filter(v => v.category_name === category) : allAdminVehicles;
     renderVehicleTable(filtered);
 }

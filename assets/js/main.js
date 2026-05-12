@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Book Now button redirects to browse
+    // Book Now button redirects to dashboard browse page
     const bookNowBtn = document.querySelector('.btn-book');
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', () => {
-            window.location.href = 'browse.php';
+            window.location.href = 'dashboard.php';
         });
     }
 });
