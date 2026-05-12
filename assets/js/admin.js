@@ -151,7 +151,15 @@ function updateGpsMap(record) {
 
     if (gpsMarker) gpsMap.removeLayer(gpsMarker);
     gpsMarker = L.marker([lat, lng]).addTo(gpsMap);
-    gpsMarker.bindPopup(`<strong>${record.vehicle_name}</strong><br>Booking #${record.booking_id}`).openPopup();
+
+    const popupContent = document.createElement('div');
+    const vehicleNameEl = document.createElement('strong');
+    vehicleNameEl.textContent = record.vehicle_name || '';
+    popupContent.appendChild(vehicleNameEl);
+    popupContent.appendChild(document.createElement('br'));
+    popupContent.appendChild(document.createTextNode(`Booking #${record.booking_id}`));
+
+    gpsMarker.bindPopup(popupContent).openPopup();
     gpsMap.setView([lat, lng], 13);
 }
 
