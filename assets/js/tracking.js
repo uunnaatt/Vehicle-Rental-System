@@ -42,7 +42,9 @@ async function fetchUserTracking() {
 
         if (userMarker) userMap.removeLayer(userMarker);
         userMarker = L.marker([lat, lng]).addTo(userMap);
-        userMarker.bindPopup(`<strong>${data.vehicle_name}</strong>`).openPopup();
+        const popupContent = document.createElement('strong');
+        popupContent.textContent = data.vehicle_name;
+        userMarker.bindPopup(popupContent).openPopup();
         userMap.setView([lat, lng], 13);
     } catch (e) {
         infoEl.textContent = 'Unable to load tracking right now.';
