@@ -26,7 +26,7 @@ class Vehicle {
 
     // Get all vehicles
     public function read($search = "", $category = "") {
-        $query = "SELECT v.id, v.name, v.brand, v.model_year, v.seats, v.transmission, v.fuel_type, v.daily_rate, v.image_url, v.status, v.description,
+        $query = "SELECT v.id, v.name, v.brand, v.model_year, v.category_id, v.location_id, v.seats, v.transmission, v.fuel_type, v.daily_rate, v.image_url, v.status, v.description,
                          c.name as category_name, l.name as location_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN categories c ON v.category_id = c.id
@@ -57,7 +57,7 @@ class Vehicle {
 
     // Get single vehicle
     public function read_single() {
-        $query = "SELECT v.id, v.name, v.brand, v.model_year, v.seats, v.transmission, v.fuel_type, v.daily_rate, v.image_url, v.status, v.description,
+        $query = "SELECT v.id, v.name, v.brand, v.model_year, v.category_id, v.location_id, v.seats, v.transmission, v.fuel_type, v.daily_rate, v.image_url, v.status, v.description,
                          c.name as category_name, l.name as location_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN categories c ON v.category_id = c.id
@@ -73,12 +73,15 @@ class Vehicle {
             $this->name = $row['name'];
             $this->brand = $row['brand'];
             $this->model_year = $row['model_year'];
+            $this->category_id = $row['category_id'];
+            $this->location_id = $row['location_id'];
             $this->seats = $row['seats'];
             $this->transmission = $row['transmission'];
             $this->fuel_type = $row['fuel_type'];
             $this->daily_rate = $row['daily_rate'];
             $this->image_url = $row['image_url'];
             $this->status = $row['status'];
+            $this->description = $row['description'];
             $this->category_name = $row['category_name'];
             $this->location_name = $row['location_name'];
             return true;

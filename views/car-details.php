@@ -1,95 +1,77 @@
 <?php include '../includes/header.php'; ?>
 
-<main class="car-details-page">
-    <div class="details-container">
-        <!-- Left Content -->
-        <div class="details-left">
-            <h1 class="car-title" id="car-name">TESLA MODEL S</h1>
-            
-            <!-- Car Features -->
-            <div class="features-section">
-                <h3 class="section-heading">Car features</h3>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">👥</div>
-                        <span class="feature-label">Capacity</span>
-                        <span class="feature-value">5 Seats</span>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <span class="feature-label">Engine Out</span>
-                        <span class="feature-value">670 HP</span>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🚀</div>
-                        <span class="feature-label">Max Speed</span>
-                        <span class="feature-value">250km/h</span>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🎯</div>
-                        <span class="feature-label">Advance</span>
-                        <span class="feature-value">Autopilot</span>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🔋</div>
-                        <span class="feature-label">Single Charge</span>
-                        <span class="feature-value">405 Miles</span>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🅿️</div>
-                        <span class="feature-label">Advance</span>
-                        <span class="feature-value">Auto Parking</span>
-                    </div>
-                </div>
+<main class="vehicle-details-page">
+    <section class="vehicle-detail-shell">
+        <div class="vehicle-detail-media">
+            <button class="favorite-action" id="detail-favorite-btn" type="button" aria-label="Save vehicle">
+                <i class="fa-regular fa-heart"></i>
+            </button>
+            <img src="../assets/images/car1.png" alt="Vehicle" id="car-image" class="vehicle-detail-image">
+        </div>
+
+        <div class="vehicle-detail-content">
+            <div class="vehicle-detail-kicker" id="vehicle-category">Vehicle</div>
+            <h1 id="car-name">Loading vehicle...</h1>
+            <p id="vehicle-description" class="vehicle-description">Fetching vehicle details from SAWARI inventory.</p>
+
+            <div class="vehicle-price-row">
+                <strong id="vehicle-price">Rs. 0</strong>
+                <span>per day</span>
             </div>
 
-            <!-- Reviews -->
-            <div class="reviews-section">
-                <div class="reviews-header">
-                    <h3 class="section-heading">Review (125)</h3>
-                    <a href="#" class="see-all">See All</a>
-                </div>
-                <div class="reviews-grid">
-                    <div class="review-card">
-                        <div class="reviewer-info">
-                            <img src="../assets/images/user1.png" alt="User" class="reviewer-img">
-                            <div>
-                                <span class="reviewer-name">Mr. Jack</span>
-                                <div class="reviewer-rating">5.0 ★</div>
-                            </div>
-                        </div>
-                        <p class="review-text">The rental car was clean, reliable, and the service was quick and efficient.</p>
-                    </div>
-                    <div class="review-card">
-                        <div class="reviewer-info">
-                            <img src="../assets/images/user2.png" alt="User" class="reviewer-img">
-                            <div>
-                                <span class="reviewer-name">Robert</span>
-                                <div class="reviewer-rating">5.0 ★</div>
-                            </div>
-                        </div>
-                        <p class="review-text">The rental car was clean, reliable, and the service was quick and efficient.</p>
-                    </div>
-                </div>
+            <div class="vehicle-spec-grid" id="vehicle-spec-grid">
+                <div class="vehicle-spec-card"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading</span></div>
             </div>
 
-            <!-- Book Now Button -->
-            <button class="btn-book-now" onclick="window.location.href='booking.php?car=tesla-model-s'">BOOK NOW</button>
+            <div class="vehicle-detail-actions">
+                <button class="btn-book-now" id="detail-book-btn" type="button">Book now</button>
+                <a href="dashboard.php" class="btn-detail-secondary">Browse more</a>
+            </div>
+        </div>
+    </section>
 
-            <!-- More Cars -->
-            <div class="more-cars-section">
-                <a href="dashboard.php" class="more-link">More>>></a>
-                <div class="more-cars-grid" id="more-cars">
-                    <!-- Loaded by JS -->
-                </div>
+    <section class="vehicle-reviews-layout">
+        <div class="reviews-panel">
+            <div class="reviews-header">
+                <h2>Customer Reviews</h2>
+                <span id="reviews-count">Loading</span>
+            </div>
+            <div class="reviews-grid" id="reviews-list">
+                <p class="muted-text">Loading reviews...</p>
             </div>
         </div>
 
-        <!-- Right Car Image -->
-        <div class="details-right">
-            <img src="../assets/images/tesla-black.png" alt="Tesla Model S" class="car-detail-image" id="car-image">
+        <aside class="review-form-panel">
+            <h2>Leave a Review</h2>
+            <p class="muted-text">Share your experience after using this vehicle.</p>
+            <form id="review-form" class="review-form">
+                <label>
+                    Rating
+                    <select id="review-rating" required>
+                        <option value="5">5 stars</option>
+                        <option value="4">4 stars</option>
+                        <option value="3">3 stars</option>
+                        <option value="2">2 stars</option>
+                        <option value="1">1 star</option>
+                    </select>
+                </label>
+                <label>
+                    Comment
+                    <textarea id="review-comment" rows="5" placeholder="Write a helpful review..." required></textarea>
+                </label>
+                <button type="submit" class="btn-auth">Submit review</button>
+                <div id="review-message" class="auth-message"></div>
+            </form>
+        </aside>
+    </section>
+
+    <section class="more-cars-section vehicle-more-section">
+        <div class="section-header">
+            <h2 class="section-title">More Vehicles</h2>
+            <a href="dashboard.php" class="more-link">View all</a>
         </div>
-    </div>
+        <div class="more-cars-grid" id="more-cars"></div>
+    </section>
 </main>
 
 <script src="../assets/js/car-details.js"></script>

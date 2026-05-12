@@ -223,14 +223,14 @@ function renderVehicleTable(vehicles) {
             <td>Rs. ${Number(v.daily_rate).toLocaleString()}</td>
             <td>
                 <select class="status-dropdown badge ${v.status}" onchange="updateVehicleStatus(${v.id}, this)">
-                    <option value="Available" ${v.status === 'Available' ? 'selected' : ''}>Available</option>
-                    <option value="Maintenance" ${v.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
-                    <option value="Rented" ${v.status === 'Rented' ? 'selected' : ''}>Rented</option>
+                    <option value="available" ${v.status === 'available' ? 'selected' : ''}>Available</option>
+                    <option value="maintenance" ${v.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                    <option value="booked" ${v.status === 'booked' ? 'selected' : ''}>Booked</option>
                 </select>
             </td>
             <td>
-                <button onclick='editVehicle(${JSON.stringify(v).replace(/'/g, "&#39;")})' style="background:none;border:none;color:#38bdf8;cursor:pointer;margin-right:10px;">✎ Edit</button>
-                <button onclick="deleteVehicle(${v.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;">🗑 Delete</button>
+                <button onclick='editVehicle(${JSON.stringify(v).replace(/'/g, "&#39;")})' style="background:none;border:none;color:#38bdf8;cursor:pointer;margin-right:10px;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <button onclick="deleteVehicle(${v.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;"><i class="fa-solid fa-trash"></i> Delete</button>
             </td>
         </tr>
     `).join('');
@@ -362,7 +362,12 @@ async function loadReviewsPreview() {
 
 function toggleSidebar() {
     const sidebar = document.getElementById('admin-sidebar');
+    if (window.matchMedia('(max-width: 900px)').matches) {
+        sidebar.classList.toggle('open');
+        return;
+    }
     sidebar.style.width = sidebar.style.width === '0px' ? '280px' : '0px';
+    sidebar.style.flexBasis = sidebar.style.width;
 }
 
 async function logout() {
