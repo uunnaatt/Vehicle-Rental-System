@@ -77,3 +77,33 @@
         }
     }
     </script>
+
+    <button id="ai-chatbot-launcher" class="ai-chatbot-launcher" type="button" aria-label="Open SAWARI assistant" aria-expanded="false">
+        <i class="fa-solid fa-comments"></i>
+        <span>Ask SAWARI</span>
+    </button>
+
+    <aside id="ai-chatbot-panel" class="ai-chatbot-panel" aria-label="SAWARI assistant">
+        <div class="ai-chatbot-header">
+            <div>
+                <p class="ai-chatbot-kicker">Personalized Assistant</p>
+                <h3>SAWARI Assistant</h3>
+            </div>
+            <button id="ai-chatbot-close" class="ai-chatbot-icon-btn" type="button" aria-label="Close assistant">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="ai-chatbot-messages" class="ai-chatbot-messages"></div>
+
+        <div id="ai-chatbot-suggestions" class="ai-chatbot-suggestions"></div>
+        <p id="ai-chatbot-status" class="ai-chatbot-status">Ready for SAWARI questions</p>
+
+        <form id="ai-chatbot-form" class="ai-chatbot-form">
+            <input id="ai-chatbot-input" type="text" maxlength="300" placeholder="Ask about bookings, vehicles, tracking..." autocomplete="off">
+            <button type="submit" class="ai-chatbot-send">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </aside>
+    <script src="../assets/js/ai-chatbot.js"></script>

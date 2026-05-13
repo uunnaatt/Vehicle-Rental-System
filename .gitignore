@@ -3,3 +3,6 @@
 Untitled.zip
 *.log
 config/config.php (if it contains secrets)
+.env
+.env.*
+config/ai_config.local.php
