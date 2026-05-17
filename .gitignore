@@ -3,3 +3,4 @@
 Untitled.zip
 *.log
 config/config.php (if it contains secrets)
+config/stripe.php
