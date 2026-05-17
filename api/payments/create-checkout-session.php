@@ -51,7 +51,7 @@ $cancelUrl = $baseUrl . "/views/payment-confirm.php?vehicle_id=" . $booking->veh
 $stripeHelper = new StripeHelper();
 $response = $stripeHelper->createCheckoutSession(
     $stripeAmount,
-    'npr', // Assuming Nepalese Rupee based on 'Rs.' in UI, or 'usd'. Using npr as Stripe supports it, otherwise use 'inr' or 'usd'. Let's use 'inr' since 'npr' might need specific accounts, actually 'usd' is safer for sandbox, but 'inr' is fine. Wait, Stripe might not support NPR. Let's use 'inr' or 'usd'. I'll use 'inr' as it's closer to Rs.
+    'usd', // Using USD as it is universally supported in Stripe Sandbox
     "Booking: " . ($booking->vehicle_name ?? "Vehicle Rental"),
     $successUrl,
     $cancelUrl,

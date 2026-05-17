@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fetch dynamic car details
     try {
         const res = await fetch(`../api/vehicles/read_single.php?id=${vehicleId}`);
-        if(res.ok) {
+        if (res.ok) {
             const data = await res.json();
             document.getElementById('confirm-car-name').textContent = data.name.toUpperCase();
             document.getElementById('confirm-car-image').src = data.image_url;
             baseDailyRate = parseFloat(data.daily_rate);
         }
-    } catch(e) { console.error('API Error:', e); }
+    } catch (e) { console.error('API Error:', e); }
 
     document.getElementById('booking-name').textContent = customerName;
     document.getElementById('booking-pickup').textContent = pickupDate;
@@ -52,48 +52,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('total-amount').textContent = 'Rs. ' + totalAmount.toLocaleString();
 
 
-// Confirm Payment Button
-const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
-if (confirmPaymentBtn) {
-    confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
-    confirmPaymentBtn.addEventListener('click', async () => {
-        const storedBookingId = localStorage.getItem('booking_id');
-        if (!storedBookingId) {
-            alert('⚠️ Booking ID not found. Please try booking again.');
-            window.location.href = 'index.php';
-            return;
-        }
+    // Confirm Payment Button
+    const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
+    if (confirmPaymentBtn) {
+        confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
+        confirmPaymentBtn.addEventListener('click', async () => {
+            const storedBookingId = localStorage.getItem('booking_id');
+            if (!storedBookingId) {
+                alert('⚠️ Booking ID not found. Please try booking again.');
+                window.location.href = 'index.php';
+                return;
+            }
 
-        confirmPaymentBtn.textContent = 'Redirecting to Stripe...';
-        confirmPaymentBtn.disabled = true;
+            confirmPaymentBtn.textContent = 'Redirecting to Stripe...';
+            confirmPaymentBtn.disabled = true;
 
-        try {
-            const res = await fetch('../api/payments/create-checkout-session.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    booking_id: storedBookingId,
-                    car_slug: carSlug
-                })
-            });
+            try {
+                const res = await fetch('../api/payments/create-checkout-session.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        booking_id: storedBookingId,
+                        car_slug: carSlug
+                    })
+                });
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if (res.ok && data.checkout_url) {
-                window.location.href = data.checkout_url;
-            } else {
-                alert('⚠️ Failed to initiate payment: ' + (data.message || 'Unknown error'));
+                if (res.ok && data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else {
+                    let errorMsg = data.message || 'Unknown error';
+                    if (data.error && data.error.error && data.error.error.message) {
+                        errorMsg += ': ' + data.error.error.message;
+                    }
+                    console.error('Stripe Checkout Error:', data);
+                    alert('⚠️ Failed to initiate payment: ' + errorMsg);
+                    confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
+                    confirmPaymentBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('⚠️ An error occurred while contacting the payment server.');
                 confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
                 confirmPaymentBtn.disabled = false;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('⚠️ An error occurred while contacting the payment server.');
-            confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
-            confirmPaymentBtn.disabled = false;
-        }
-    });
-}
+        });
+    }
 });
