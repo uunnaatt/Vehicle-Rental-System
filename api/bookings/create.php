@@ -68,7 +68,10 @@ if(!empty($_POST['user_id']) && !empty($_POST['vehicle_id']) && !empty($_POST['s
 
     if($booking->create()) {
         http_response_code(201);
-        echo json_encode(array("message" => "Booking was successfully created."));
+        echo json_encode(array(
+            "message" => "Booking was successfully created.",
+            "booking_id" => $booking->id
+        ));
     } else {
         http_response_code(409); // Conflict
         echo json_encode(array("message" => "Vehicle is not available for the selected dates."));

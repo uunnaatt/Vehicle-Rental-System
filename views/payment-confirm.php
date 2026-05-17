@@ -42,33 +42,13 @@
                 </div>
             </div>
 
-            <!-- Card Information -->
+            <!-- Stripe Payment Info -->
             <div class="payment-card card-info">
-                <h3 class="card-title">Card Information</h3>
-                <form id="payment-form">
-                    <div class="form-group">
-                        <input type="text" class="form-input" placeholder="Full Name" id="card-name" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" class="form-input" placeholder="Email Address" id="card-email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-input" placeholder="Number" id="card-number" maxlength="19" required>
-                        <div class="card-icons">
-                            <img src="../assets/images/visa.png" alt="Visa" class="card-icon">
-                            <img src="../assets/images/mastercard.png" alt="Mastercard" class="card-icon">
-                            <img src="../assets/images/amex.png" alt="Amex" class="card-icon">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="text" class="form-input" placeholder="MM/YY" id="card-expiry" maxlength="5" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-input" placeholder="CVV" id="card-cvv" maxlength="3" required>
-                        </div>
-                    </div>
-                </form>
+                <h3 class="card-title">Payment Method</h3>
+                <div style="text-align: center; padding: 2rem 0;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" style="width: 150px; margin-bottom: 1rem;">
+                    <p style="color: #666; font-size: 1.1rem;">You will be redirected to Stripe to securely complete your payment.</p>
+                </div>
             </div>
 
             <!-- Payment Summary -->

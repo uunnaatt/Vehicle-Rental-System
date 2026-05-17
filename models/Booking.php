@@ -16,6 +16,8 @@ class Booking {
     public $collateral_type;
     public $collateral_image;
     public $agreement_accepted;
+    public $payment_status;
+    public $stripe_session_id;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -52,11 +54,12 @@ class Booking {
                       dropoff_location_id=:dropoff_location_id, start_date=:start_date, 
                       end_date=:end_date, total_price=:total_price, status=:status, 
                       collateral_type=:collateral_type, collateral_image=:collateral_image, 
-                      agreement_accepted=:agreement_accepted";
+                      agreement_accepted=:agreement_accepted, payment_status=:payment_status";
 
         $stmt = $this->conn->prepare($query);
 
         $this->status = "pending";
+        $this->payment_status = "unpaid";
 
         $stmt->bindParam(':user_id', $this->user_id);
         $stmt->bindParam(':vehicle_id', $this->vehicle_id);
@@ -68,14 +71,45 @@ class Booking {
         $stmt->bindParam(':status', $this->status);
         $stmt->bindParam(':collateral_type', $this->collateral_type);
         $stmt->bindParam(':collateral_image', $this->collateral_image);
+        $stmt->bindParam(':payment_status', $this->payment_status);
         
         $agreement = $this->agreement_accepted ? 1 : 0;
         $stmt->bindParam(':agreement_accepted', $agreement, PDO::PARAM_INT);
 
         if($stmt->execute()) {
+            $this->id = $this->conn->lastInsertId();
             return true;
         }
         return false;
+    }
+
+    public function read_single() {
+        $query = "SELECT b.*, v.name as vehicle_name FROM " . $this->table_name . " b
+                  LEFT JOIN vehicles v ON b.vehicle_id = v.id
+                  WHERE b.id = :id LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $this->total_price = $row['total_price'];
+            $this->payment_status = $row['payment_status'];
+            $this->stripe_session_id = $row['stripe_session_id'];
+            // add vehicle name as a dynamic property for convenience
+            $this->vehicle_name = $row['vehicle_name'];
+            return true;
+        }
+        return false;
+    }
+
+    public function updatePaymentStatus() {
+        $query = "UPDATE " . $this->table_name . " SET payment_status = :payment_status, stripe_session_id = :stripe_session_id, status = :status WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':payment_status', $this->payment_status);
+        $stmt->bindParam(':stripe_session_id', $this->stripe_session_id);
+        $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     // Read user bookings

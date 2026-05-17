@@ -202,6 +202,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         return;
                     }
+                    if (bookingRes.ok && bookingData.booking_id) {
+                        localStorage.setItem('booking_id', bookingData.booking_id);
+                    }
                 } catch (err) {
                     console.warn('Booking API not connected, continuing to payment page...');
                 }

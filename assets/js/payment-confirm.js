@@ -52,72 +52,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('total-amount').textContent = 'Rs. ' + totalAmount.toLocaleString();
 
 
-// Format card number with spaces
-const cardNumberInput = document.getElementById('card-number');
-if (cardNumberInput) {
-    cardNumberInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
-        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-        e.target.value = formattedValue;
-    });
-}
-
-// Format expiry date
-const cardExpiryInput = document.getElementById('card-expiry');
-if (cardExpiryInput) {
-    cardExpiryInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length >= 2) {
-            value = value.substring(0, 2) + '/' + value.substring(2, 4);
-        }
-        e.target.value = value;
-    });
-}
-
-// CVV - only numbers
-const cardCvvInput = document.getElementById('card-cvv');
-if (cardCvvInput) {
-    cardCvvInput.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '');
-    });
-}
-
 // Confirm Payment Button
 const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
 if (confirmPaymentBtn) {
-    confirmPaymentBtn.addEventListener('click', () => {
-        // Validate form
-        const cardName = document.getElementById('card-name').value;
-        const cardEmail = document.getElementById('card-email').value;
-        const cardNumber = document.getElementById('card-number').value;
-        const cardExpiry = document.getElementById('card-expiry').value;
-        const cardCvv = document.getElementById('card-cvv').value;
-
-        if (!cardName || !cardEmail || !cardNumber || !cardExpiry || !cardCvv) {
-            alert('⚠️ Please fill in all card information!');
+    confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
+    confirmPaymentBtn.addEventListener('click', async () => {
+        const storedBookingId = localStorage.getItem('booking_id');
+        if (!storedBookingId) {
+            alert('⚠️ Booking ID not found. Please try booking again.');
+            window.location.href = 'index.php';
             return;
         }
 
-        // Validate card number length (16 digits + 3 spaces = 19)
-        if (cardNumber.replace(/\s/g, '').length !== 16) {
-            alert('⚠️ Please enter a valid 16-digit card number!');
-            return;
+        confirmPaymentBtn.textContent = 'Redirecting to Stripe...';
+        confirmPaymentBtn.disabled = true;
+
+        try {
+            const res = await fetch('../api/payments/create-checkout-session.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    booking_id: storedBookingId,
+                    car_slug: carSlug
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                alert('⚠️ Failed to initiate payment: ' + (data.message || 'Unknown error'));
+                confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
+                confirmPaymentBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('⚠️ An error occurred while contacting the payment server.');
+            confirmPaymentBtn.textContent = 'PAY WITH STRIPE';
+            confirmPaymentBtn.disabled = false;
         }
-
-        // Validate CVV length
-        if (cardCvv.length !== 3) {
-            alert('⚠️ Please enter a valid 3-digit CVV!');
-            return;
-        }
-
-        // Save booking data for success page
-        localStorage.setItem('bookingId', bookingId);
-        localStorage.setItem('trxId', trxId);
-        localStorage.setItem('totalAmount', totalAmount);
-
-        // Redirect to success page
-        alert('✅ Payment Confirmed! Redirecting...');
-        window.location.href = 'payment-success.php?car=' + carSlug;
     });
 }
 });
